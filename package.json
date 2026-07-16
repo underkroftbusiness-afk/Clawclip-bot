@@ -8,8 +8,14 @@
   },
   "dependencies": {
     "discord.js": "^14.14.1"
-  }"engines": {
-  "node": "20.x"
+  },
+  "engines": {
+    "node": "20.x"
+  }
+}
+
+}
+
 }
 
 }
