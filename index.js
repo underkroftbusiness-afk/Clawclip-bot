@@ -17,4 +17,6 @@ client.on('messageCreate', (message) => {
   }
 });
 
+// 🔑 login met token uit Railway
 client.login(process.env.DISCORD_TOKEN);
+
