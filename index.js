@@ -18,7 +18,7 @@ const client = new Client({
 });
 
 // ✅ Bot online
-client.once('ready', async () => {
+client.once('clientReady', async () => {
   console.log(`Bot is online as ${client.user.tag}`);
 
   // 🎟️ Ticket button in support channel
