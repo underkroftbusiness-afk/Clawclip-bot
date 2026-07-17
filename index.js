@@ -50,7 +50,7 @@ client.once('clientReady', async () => {
     await supportChannel.send({ embeds: [embed], components: [row] });
   }
 
-  // 📜 RULES MESSAGE (BLACK + NUMBERED + COMPACT)
+  // 📜 RULES MESSAGE (SUPER COMPACT)
   const rulesChannel = await client.channels.fetch(RULES_CHANNEL_ID);
   const rulesMessages = await rulesChannel.messages.fetch({ limit: 20 });
   const rulesExisting = rulesMessages.find(
@@ -62,16 +62,16 @@ client.once('clientReady', async () => {
       .setColor('#2b2d31')
       .setTitle('rules📜')
       .setDescription(
-        "**1. Respect Everyone**\nTreat everyone normally. No toxicity, hate, or insults.\n" +
-        "**2. No Spam**\nNo spam, caps spam, ping spam, or repeated messages.\n" +
-        "**3. Stay On Topic**\nUse channels for their intended purpose.\n" +
-        "**4. No NSFW**\nNo NSFW, gore, or inappropriate content.\n" +
-        "**5. No Self‑Promo**\nNo advertising your socials, servers, or services.\n" +
-        "**6. Follow Staff**\nFollow instructions from admins and moderators.\n" +
-        "**7. Keep It Safe**\nNo threats, no sharing private info, no unsafe behavior.\n" +
-        "**8. No Illegal Content**\nNo hacks, scams, leaks, or illegal downloads.\n" +
-        "**9. No Doxing**\nDo not share anyone’s private information — addresses, numbers, names, school, workplace, IPs, anything.\n" +
-        "**10. Follow Discord Guidelines**\nWe follow the official Discord Terms of Service and Community Guidelines."
+        "**1. Respect Everyone**\nTreat everyone normally. No toxicity, hate, or insults."
+        + "\n**2. No Spam**\nNo spam, caps spam, ping spam, or repeated messages."
+        + "\n**3. Stay On Topic**\nUse channels for their intended purpose."
+        + "\n**4. No NSFW**\nNo NSFW, gore, or inappropriate content."
+        + "\n**5. No Self‑Promo**\nNo advertising your socials, servers, or services."
+        + "\n**6. Follow Staff**\nFollow instructions from admins and moderators."
+        + "\n**7. Keep It Safe**\nNo threats, no sharing private info, no unsafe behavior."
+        + "\n**8. No Illegal Content**\nNo hacks, scams, leaks, or illegal downloads."
+        + "\n**9. No Doxing**\nDo not share anyone’s private information — addresses, numbers, names, school, workplace, IPs, anything."
+        + "\n**10. Follow Discord Guidelines**\nWe follow the official Discord Terms of Service and Community Guidelines."
       )
       .setFooter({ text: 'Underclips Server Rules' });
 
@@ -102,6 +102,7 @@ client.on('interactionCreate', async (interaction) => {
       const ticketChannel = await interaction.guild.channels.create({
         name: `ticket-${interaction.user.username}`,
         type: 0,
+        topic: `Support ticket for ${interaction.user.tag}`,
         permissionOverwrites: [
           { id: interaction.guild.roles.everyone, deny: ['ViewChannel'] },
           { id: interaction.user.id, allow: ['ViewChannel', 'SendMessages'] }
@@ -111,7 +112,10 @@ client.on('interactionCreate', async (interaction) => {
       const ticketEmbed = new EmbedBuilder()
         .setColor('#2b2d31')
         .setTitle('🎫 Ticket Created')
-        .setDescription(`Welcome <@${interaction.user.id}>!\nSomeone will help you shortly.`)
+        .setDescription(
+          `Welcome <@${interaction.user.id}>!\nSomeone will help you shortly.\n` +
+          "If your issue is solved, press the button below to close your ticket."
+        )
         .setFooter({ text: 'Underclips Support' });
 
       const closeRow = new ActionRowBuilder().addComponents(
@@ -123,7 +127,6 @@ client.on('interactionCreate', async (interaction) => {
 
       await ticketChannel.send({ embeds: [ticketEmbed], components: [closeRow] });
 
-      // 🔥 FIXED — stops infinite “thinking”
       await interaction.editReply({
         content: `✅ Your ticket has been created: ${ticketChannel}`,
         ephemeral: true
@@ -132,13 +135,13 @@ client.on('interactionCreate', async (interaction) => {
     } catch (err) {
       console.error(err);
       await interaction.editReply({
-        content: '⚠️ Something went wrong while creating your ticket.',
+        content: '⚠️ Something went wrong while creating your ticket.\nMake sure the bot has **Manage Channels** permission.',
         ephemeral: true
       });
     }
   }
 
-  // 🔒 Close ticket (ONLY ticket owner)
+  // 🔒 Close ticket
   if (interaction.customId === 'close_ticket') {
     const channel = interaction.channel;
     const isOwner = channel.name.includes(interaction.user.username);
@@ -159,6 +162,8 @@ client.on('messageCreate', (message) => {
 
 // 🔑 Login
 client.login(process.env.DISCORD_TOKEN);
+
+
 
 
 
