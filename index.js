@@ -18,9 +18,9 @@ const client = new Client({
   partials: [Partials.Channel]
 });
 
-// 🧩 CHANGE THIS
+// 🧩 CHANGE THESE
 const SUPPORT_CHANNEL_ID = "1516092800469303437";
-const RULES_CHANNEL_ID = "1516812179410780261";
+const RULES_CHANNEL_ID = "YOUR_RULES_CHANNEL_ID";
 
 // ✅ Bot online
 client.once('clientReady', async () => {
@@ -50,7 +50,7 @@ client.once('clientReady', async () => {
     await supportChannel.send({ embeds: [embed], components: [row] });
   }
 
-  // 📜 RULES MESSAGE (BLACK + NUMBERED + UNDERCLIPS)
+  // 📜 RULES MESSAGE (BLACK + NUMBERED + COMPACT)
   const rulesChannel = await client.channels.fetch(RULES_CHANNEL_ID);
   const rulesMessages = await rulesChannel.messages.fetch({ limit: 20 });
   const rulesExisting = rulesMessages.find(
@@ -60,37 +60,18 @@ client.once('clientReady', async () => {
   if (!rulesExisting) {
     const rulesEmbed = new EmbedBuilder()
       .setColor('#2b2d31')
-      .setTitle('Rules📜')
+      .setTitle('rules📜')
       .setDescription(
-        "**1. Respect Everyone**\n" +
-        "Treat everyone normally. No toxicity, hate, or insults.\n\n" +
-
-        "**2. No Spam**\n" +
-        "No spam, caps spam, ping spam, or repeated messages.\n\n" +
-
-        "**3. Stay On Topic**\n" +
-        "Use channels for their intended purpose.\n\n" +
-
-        "**4. No NSFW**\n" +
-        "No NSFW, gore, or inappropriate content.\n\n" +
-
-        "**5. No Self‑Promo**\n" +
-        "No advertising your socials, servers, or services.\n\n" +
-
-        "**6. Follow Staff**\n" +
-        "Follow instructions from admins and moderators.\n\n" +
-
-        "**7. Keep It Safe**\n" +
-        "No threats, no sharing private info, no unsafe behavior.\n\n" +
-
-        "**8. No Illegal Content**\n" +
-        "No hacks, scams, leaks, or illegal downloads.\n\n" +
-
-        "**9. No Doxing**\n" +
-        "Do not share anyone’s private information — addresses, numbers, names, school, workplace, IPs, anything.\n\n" +
-
-        "**10. Follow Discord Guidelines**\n" +
-        "We follow the official Discord Terms of Service and Community Guidelines at all times."
+        "**1. Respect Everyone**\nTreat everyone normally. No toxicity, hate, or insults.\n" +
+        "**2. No Spam**\nNo spam, caps spam, ping spam, or repeated messages.\n" +
+        "**3. Stay On Topic**\nUse channels for their intended purpose.\n" +
+        "**4. No NSFW**\nNo NSFW, gore, or inappropriate content.\n" +
+        "**5. No Self‑Promo**\nNo advertising your socials, servers, or services.\n" +
+        "**6. Follow Staff**\nFollow instructions from admins and moderators.\n" +
+        "**7. Keep It Safe**\nNo threats, no sharing private info, no unsafe behavior.\n" +
+        "**8. No Illegal Content**\nNo hacks, scams, leaks, or illegal downloads.\n" +
+        "**9. No Doxing**\nDo not share anyone’s private information — addresses, numbers, names, school, workplace, IPs, anything.\n" +
+        "**10. Follow Discord Guidelines**\nWe follow the official Discord Terms of Service and Community Guidelines."
       )
       .setFooter({ text: 'Underclips Server Rules' });
 
@@ -115,32 +96,46 @@ client.on('interactionCreate', async (interaction) => {
 
   // 🟢 Create ticket
   if (interaction.customId === 'create_ticket') {
-    await interaction.deferReply({ ephemeral: true });
+    try {
+      await interaction.deferReply({ ephemeral: true });
 
-    const ticketChannel = await interaction.guild.channels.create({
-      name: `ticket-${interaction.user.username}`,
-      type: 0,
-      permissionOverwrites: [
-        { id: interaction.guild.roles.everyone, deny: ['ViewChannel'] },
-        { id: interaction.user.id, allow: ['ViewChannel', 'SendMessages'] }
-      ]
-    });
+      const ticketChannel = await interaction.guild.channels.create({
+        name: `ticket-${interaction.user.username}`,
+        type: 0,
+        permissionOverwrites: [
+          { id: interaction.guild.roles.everyone, deny: ['ViewChannel'] },
+          { id: interaction.user.id, allow: ['ViewChannel', 'SendMessages'] }
+        ]
+      });
 
-    const ticketEmbed = new EmbedBuilder()
-      .setColor('#2b2d31')
-      .setTitle('🎫 Ticket Created')
-      .setDescription(`Welcome <@${interaction.user.id}>!\nSomeone will help you shortly.`)
-      .setFooter({ text: 'Underclips Support' });
+      const ticketEmbed = new EmbedBuilder()
+        .setColor('#2b2d31')
+        .setTitle('🎫 Ticket Created')
+        .setDescription(`Welcome <@${interaction.user.id}>!\nSomeone will help you shortly.`)
+        .setFooter({ text: 'Underclips Support' });
 
-    const closeRow = new ActionRowBuilder().addComponents(
-      new ButtonBuilder()
-        .setCustomId('close_ticket')
-        .setLabel('🔒 Close Ticket')
-        .setStyle(ButtonStyle.Danger)
-    );
+      const closeRow = new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+          .setCustomId('close_ticket')
+          .setLabel('🔒 Close Ticket')
+          .setStyle(ButtonStyle.Danger)
+      );
 
-    await ticketChannel.send({ embeds: [ticketEmbed], components: [closeRow] });
-    await interaction.editReply({ content: `✅ Your ticket has been created: ${ticketChannel}` });
+      await ticketChannel.send({ embeds: [ticketEmbed], components: [closeRow] });
+
+      // 🔥 FIXED — stops infinite “thinking”
+      await interaction.editReply({
+        content: `✅ Your ticket has been created: ${ticketChannel}`,
+        ephemeral: true
+      });
+
+    } catch (err) {
+      console.error(err);
+      await interaction.editReply({
+        content: '⚠️ Something went wrong while creating your ticket.',
+        ephemeral: true
+      });
+    }
   }
 
   // 🔒 Close ticket (ONLY ticket owner)
@@ -164,6 +159,7 @@ client.on('messageCreate', (message) => {
 
 // 🔑 Login
 client.login(process.env.DISCORD_TOKEN);
+
 
 
 
