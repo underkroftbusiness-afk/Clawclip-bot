@@ -20,7 +20,7 @@ const client = new Client({
 
 // 🧩 CHANGE THESE
 const SUPPORT_CHANNEL_ID = "1516092800469303437";
-const RULES_CHANNEL_ID = "YOUR_RULES_CHANNEL_ID";
+const RULES_CHANNEL_ID = "1516812179410780261";
 
 // ✅ Bot online
 client.once('clientReady', async () => {
