@@ -18,17 +18,16 @@ const client = new Client({
   partials: [Partials.Channel]
 });
 
-// STAFF ROLE ID (change this!)
-const STAFF_ROLE_ID = "YOUR_STAFF_ROLE_ID";
+// 🧩 CHANGE THIS
+const SUPPORT_CHANNEL_ID = "1516092800469303437";
+const RULES_CHANNEL_ID = "1516812179410780261";
 
 // ✅ Bot online
 client.once('clientReady', async () => {
   console.log(`Bot is online as ${client.user.tag}`);
 
-  // 🎫 Support channel message
-  const supportChannelId = "1516092800469303437"; 
-  const supportChannel = await client.channels.fetch(supportChannelId);
-
+  // 🎟️ Support message
+  const supportChannel = await client.channels.fetch(SUPPORT_CHANNEL_ID);
   const supportMessages = await supportChannel.messages.fetch({ limit: 20 });
   const supportExisting = supportMessages.find(
     m => m.author.id === client.user.id && m.embeds.length > 0
@@ -39,7 +38,7 @@ client.once('clientReady', async () => {
       .setColor('#2b2d31')
       .setTitle('Need help?')
       .setDescription('Click the button below to open a support ticket.')
-      .setFooter({ text: 'ClawClips Support System' });
+      .setFooter({ text: 'Underclips Support System' });
 
     const row = new ActionRowBuilder().addComponents(
       new ButtonBuilder()
@@ -48,16 +47,11 @@ client.once('clientReady', async () => {
         .setStyle(ButtonStyle.Primary)
     );
 
-    await supportChannel.send({
-      embeds: [embed],
-      components: [row]
-    });
+    await supportChannel.send({ embeds: [embed], components: [row] });
   }
 
-  // 📜 RULES MESSAGE
-  const rulesChannelId = "1516812179410780261"; 
-  const rulesChannel = await client.channels.fetch(rulesChannelId);
-
+  // 📜 RULES MESSAGE (BLACK + NUMBERED + UNDERCLIPS)
+  const rulesChannel = await client.channels.fetch(RULES_CHANNEL_ID);
   const rulesMessages = await rulesChannel.messages.fetch({ limit: 20 });
   const rulesExisting = rulesMessages.find(
     m => m.author.id === client.user.id && m.embeds.length > 0
@@ -66,75 +60,77 @@ client.once('clientReady', async () => {
   if (!rulesExisting) {
     const rulesEmbed = new EmbedBuilder()
       .setColor('#2b2d31')
-      .setTitle('rules📜')
+      .setTitle('Rules📜')
       .setDescription(
-        "**Respect Everyone**\n" +
+        "**1. Respect Everyone**\n" +
         "Treat everyone normally. No toxicity, hate, or insults.\n\n" +
 
-        "**No Spam**\n" +
+        "**2. No Spam**\n" +
         "No spam, caps spam, ping spam, or repeated messages.\n\n" +
 
-        "**Stay On Topic**\n" +
+        "**3. Stay On Topic**\n" +
         "Use channels for their intended purpose.\n\n" +
 
-        "**No NSFW**\n" +
+        "**4. No NSFW**\n" +
         "No NSFW, gore, or inappropriate content.\n\n" +
 
-        "**No Self‑Promo**\n" +
+        "**5. No Self‑Promo**\n" +
         "No advertising your socials, servers, or services.\n\n" +
 
-        "**Follow Staff**\n" +
+        "**6. Follow Staff**\n" +
         "Follow instructions from admins and moderators.\n\n" +
 
-        "**Keep It Safe**\n" +
+        "**7. Keep It Safe**\n" +
         "No threats, no sharing private info, no unsafe behavior.\n\n" +
 
-        "**No Illegal Content**\n" +
+        "**8. No Illegal Content**\n" +
         "No hacks, scams, leaks, or illegal downloads.\n\n" +
 
-        "**No Doxing**\n" +
+        "**9. No Doxing**\n" +
         "Do not share anyone’s private information — addresses, numbers, names, school, workplace, IPs, anything.\n\n" +
 
-        "**Follow Discord Guidelines**\n" +
+        "**10. Follow Discord Guidelines**\n" +
         "We follow the official Discord Terms of Service and Community Guidelines at all times."
       )
-      .setFooter({ text: 'ClawClips Server Rules' });
+      .setFooter({ text: 'Underclips Server Rules' });
 
     await rulesChannel.send({ embeds: [rulesEmbed] });
   }
 });
 
-// 💬 Auto-DM when someone joins
+// 💬 Auto‑DM when someone joins
 client.on('guildMemberAdd', async (member) => {
   try {
     await member.send(
-      `👋 Welcome to ClawClips — The Clipping Server That Helps You!\n\nClawClips is a place made for people who clip. You join, you get support, you grow, and you find chances to earn more from your content. It’s a server built to make clipping easier and help you improve.`
+      `👋 Welcome to Underclips — The Clipping Server That Helps You!\n\nUnderclips is a place made for people who clip. You join, you get support, you grow, and you find chances to earn more from your content. It’s a server built to make clipping easier and help you improve.`
     );
-  } catch (err) {
+  } catch {
     console.log('Could not send DM.');
   }
 });
 
-// 🎟️ Create ticket
+// 🎟️ Ticket creation & closing
 client.on('interactionCreate', async (interaction) => {
   if (!interaction.isButton()) return;
 
+  // 🟢 Create ticket
   if (interaction.customId === 'create_ticket') {
+    await interaction.deferReply({ ephemeral: true });
+
     const ticketChannel = await interaction.guild.channels.create({
       name: `ticket-${interaction.user.username}`,
       type: 0,
       permissionOverwrites: [
         { id: interaction.guild.roles.everyone, deny: ['ViewChannel'] },
-        { id: interaction.user.id, allow: ['ViewChannel', 'SendMessages'] },
-        { id: STAFF_ROLE_ID, allow: ['ViewChannel', 'SendMessages'] }
+        { id: interaction.user.id, allow: ['ViewChannel', 'SendMessages'] }
       ]
     });
 
     const ticketEmbed = new EmbedBuilder()
       .setColor('#2b2d31')
       .setTitle('🎫 Ticket Created')
-      .setDescription(`Welcome <@${interaction.user.id}>!\nA staff member will help you shortly.`)
-      .setFooter({ text: 'ClawClips Support' });
+      .setDescription(`Welcome <@${interaction.user.id}>!\nSomeone will help you shortly.`)
+      .setFooter({ text: 'Underclips Support' });
 
     const closeRow = new ActionRowBuilder().addComponents(
       new ButtonBuilder()
@@ -143,50 +139,30 @@ client.on('interactionCreate', async (interaction) => {
         .setStyle(ButtonStyle.Danger)
     );
 
-    await ticketChannel.send({
-      embeds: [ticketEmbed],
-      components: [closeRow]
-    });
-
-    await interaction.reply({
-      content: `Your ticket has been created: ${ticketChannel}`,
-      ephemeral: true
-    });
+    await ticketChannel.send({ embeds: [ticketEmbed], components: [closeRow] });
+    await interaction.editReply({ content: `✅ Your ticket has been created: ${ticketChannel}` });
   }
 
-  // 🔒 Close ticket (user + staff only)
+  // 🔒 Close ticket (ONLY ticket owner)
   if (interaction.customId === 'close_ticket') {
     const channel = interaction.channel;
-
-    const isStaff = interaction.member.roles.cache.has(STAFF_ROLE_ID);
     const isOwner = channel.name.includes(interaction.user.username);
 
-    if (!isStaff && !isOwner) {
-      return interaction.reply({
-        content: "You can't close this ticket.",
-        ephemeral: true
-      });
+    if (!isOwner) {
+      return interaction.reply({ content: "Only the ticket owner can close this.", ephemeral: true });
     }
 
-    await interaction.reply({
-      content: "Ticket closed. Deleting in 3 seconds...",
-      ephemeral: true
-    });
-
-    setTimeout(() => {
-      channel.delete().catch(() => {});
-    }, 3000);
+    await interaction.reply({ content: "Ticket closed. Deleting in 3 seconds...", ephemeral: true });
+    setTimeout(() => channel.delete().catch(() => {}), 3000);
   }
 });
 
 // 🏓 Ping command
 client.on('messageCreate', (message) => {
-  if (message.content === '!ping') {
-    message.reply('Pong!');
-  }
+  if (message.content === '!ping') message.reply('Pong!');
 });
 
-// 🔑 Login with Railway token
+// 🔑 Login
 client.login(process.env.DISCORD_TOKEN);
 
 
