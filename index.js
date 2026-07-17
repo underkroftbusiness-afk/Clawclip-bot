@@ -21,8 +21,8 @@ const client = new Client({
 client.once('ready', async () => {
   console.log(`Bot is online as ${client.user.tag}`);
 
-  // 🎟️ Ticket-knop in support kanaal
-  const supportChannelId = "YOUR_SUPPORT_CHANNEL_ID"; // <-- zet hier jouw kanaal ID
+  // 🎟️ Ticket button in support channel
+  const supportChannelId = "1516092800469303437"; 
 
   const channel = await client.channels.fetch(supportChannelId);
 
@@ -39,18 +39,18 @@ client.once('ready', async () => {
   });
 });
 
-// 💬 Auto-DM bij join
+// 💬 Auto-DM when someone joins
 client.on('guildMemberAdd', async (member) => {
   try {
     await member.send(
-      `👋 Join ClawClips — The Clipping Server That Helps You!\n\nClawClips is a place made for people who clip. You join, you get support, you grow, and you find chances to earn more from your content. It’s a server built to make clipping easier and help you improve.`
+      `👋 Welcome to ClawClips — The Clipping Server That Helps You!\n\nClawClips is a place made for people who clip. You join, you get support, you grow, and you find chances to earn more from your content. It’s a server built to make clipping easier and help you improve.`
     );
   } catch (err) {
-    console.log('Kon geen DM sturen.');
+    console.log('Could not send DM.');
   }
 });
 
-// 🎟️ Ticket aanmaken
+// 🎟️ Create ticket
 client.on('interactionCreate', async (interaction) => {
   if (!interaction.isButton()) return;
 
@@ -78,7 +78,8 @@ client.on('messageCreate', (message) => {
   }
 });
 
-// 🔑 Login met token uit Railway
+// 🔑 Login with Railway token
 client.login(process.env.DISCORD_TOKEN);
+
 
 
