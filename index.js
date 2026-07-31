@@ -22,7 +22,8 @@ const client = new Client({
 // 🧩 CHANGE THESE
 const SUPPORT_CHANNEL_ID = "1516092800469303437";
 const RULES_CHANNEL_ID = "1516812179410780261";
-const CAMPAIGN_INFO_CHANNEL_ID = "YOUR_CAMPAIGN_INFO_CHANNEL_ID";
+const CAMPAIGN_INFO_CHANNEL_ID = "1515782662412046416";
+const CAMPAIGN_RULES_CHANNEL_ID = "1520485646311882945";
 
 // ✅ Bot online
 client.once('ready', async () => {
@@ -80,7 +81,7 @@ client.once('ready', async () => {
     await rulesChannel.send({ embeds: [rulesEmbed] });
   }
 
-  // 💰 PAYOUT INFO EMBED (YOUR EXACT TEXT — NOTHING CHANGED)
+  // 💰 PAYOUT INFO EMBED
   const campaignInfoChannel = await client.channels.fetch(CAMPAIGN_INFO_CHANNEL_ID);
   const campaignMessages = await campaignInfoChannel.messages.fetch({ limit: 20 });
   const campaignExisting = campaignMessages.find(
@@ -116,71 +117,17 @@ client.once('ready', async () => {
 
     await campaignInfoChannel.send({ embeds: [payoutEmbed] });
   }
-});
 
-// 💬 Auto‑DM when someone joins
-client.on('guildMemberAdd', async (member) => {
-  try {
-    await member.send(
-      `👋 Welcome to Underclips — The Clipping Server That Helps You!\n\nUnderclips is a place made for people who clip. You join, you get support, you grow, and you find chances to earn more from your content. It’s a server built to make clipping easier and help you improve.`
-    );
-  } catch {
-    console.log('Could not send DM.');
-  }
-});
+  // 📜 SHORTENED CAMPAIGN RULES EMBED (NEW)
+  const campaignRulesChannel = await client.channels.fetch(CAMPAIGN_RULES_CHANNEL_ID);
+  const campaignRulesMessages = await campaignRulesChannel.messages.fetch({ limit: 20 });
+  const campaignRulesExisting = campaignRulesMessages.find(
+    m => m.author.id === client.user.id && m.embeds.length > 0
+  );
 
-// 🎟️ Ticket creation & closing
-client.on('interactionCreate', async (interaction) => {
-  if (!interaction.isButton()) return;
-
-  if (interaction.customId === 'create_ticket') {
-    try {
-      await interaction.deferReply({ ephemeral: true });
-
-      const ticketChannel = await interaction.guild.channels.create({
-        name: `ticket-${interaction.user.username}`,
-        type: 0,
-        topic: `Support ticket for ${interaction.user.tag}`,
-        permissionOverwrites: [
-          {
-            id: interaction.guild.roles.everyone,
-            deny: [
-              PermissionsBitField.Flags.ViewChannel,
-              PermissionsBitField.Flags.SendMessages
-            ]
-          },
-          {
-            id: interaction.user.id,
-            allow: [
-              PermissionsBitField.Flags.ViewChannel,
-              PermissionsBitField.Flags.SendMessages,
-              PermissionsBitField.Flags.ReadMessageHistory
-            ]
-          },
-          {
-            id: client.user.id,
-            allow: [
-              PermissionsBitField.Flags.ViewChannel,
-              PermissionsBitField.Flags.SendMessages,
-              PermissionsBitField.Flags.ManageChannels,
-              PermissionsBitField.Flags.EmbedLinks
-            ]
-          }
-        ]
-      });
-
-      const ticketEmbed = new EmbedBuilder()
-        .setColor('#2b2d31')
-        .setTitle('🎫 Ticket Created')
-        .setDescription(`Welcome <@${interaction.user.id}>! Someone will help you shortly.\nIf your issue is solved, press the button below to close your ticket.`)
-        .setFooter({ text: 'Underclips Support' });
-
-      const closeRow = new ActionRowBuilder().addComponents(
-        new ButtonBuilder()
-          .setCustomId('close_ticket')
-          .setLabel('🔒 Close Ticket')
-          .setStyle(ButtonStyle
-
+  if (!campaignRulesExisting) {
+    const campaignRulesEmbed = new EmbedBuilder()
+      .setColor('#
 
 
 
