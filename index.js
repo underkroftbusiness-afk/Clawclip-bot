@@ -81,7 +81,7 @@ client.once('ready', async () => {
     await rulesChannel.send({ embeds: [rulesEmbed] });
   }
 
-  // 💰 PAYOUT INFO EMBED (FIXED SPACING + BLACK BACKGROUND)
+  // 💰 CAMPAIGN INFO (PAYOUT) — SPACING FIXED
   const campaignInfoChannel = await client.channels.fetch(CAMPAIGN_INFO_CHANNEL_ID);
   const campaignMessages = await campaignInfoChannel.messages.fetch({ limit: 20 });
   const campaignExisting = campaignMessages.find(
@@ -93,32 +93,20 @@ client.once('ready', async () => {
       .setColor('#2b2d31')
       .setTitle('💰 Payout Calculation')
       .setDescription(
-        "**Campaigns use two systems to calculate payment.**\n\n" +
-
-        "**Payrate Based System**\n" +
-        "Pays a fixed amount for your views. You earn the same amount every time you reach the required number of views. Example: if the rate is one dollar per one thousand views, you receive one dollar for every one thousand views you generate.\n\n" +
-
-        "**The Pot Style System**\n" +
-        "Pays you based on your share of all views in the campaign. If you produce 20% of the total views, you receive 20% of the total budget. We take 30% of your earnings, so I get 30% of your 20% share.\n\n" +
-
-        "**Minimum Views: Individual Posts**\n" +
-        "A post must reach at least 1000 views before those views count toward your total.\n\n" +
-
-        "**Payout Timelines**\n" +
-        "Payments are not sent immediately. The campaign must end first, then posts are reviewed, and the sponsor must approve the results.\n\n" +
-
-        "**Payment Method**\n" +
-        "You are paid only through the method chosen by the campaign, such as PayPal.\n\n" +
-
-        "**Payment Details**\n" +
-        "Your payout is sent to the payment information saved at the end of the campaign. If the payment is delivered but you cannot withdraw it, you must fix that issue yourself."
+        "**Campaigns use two systems to calculate payment.** Pays a fixed or percentage‑based amount depending on the campaign.\n" +
+        "**Payrate Based System** Pays a fixed amount for your views. You earn the same amount every time you reach the required number of views. Example: if the rate is one dollar per one thousand views, you receive one dollar for every one thousand views you generate.\n" +
+        "**The Pot Style System** Pays you based on your share of all views in the campaign. If you produce 20% of the total views, you receive 20% of the total budget. We take 30% of your earnings, so I get 30% of your 20% share.\n" +
+        "**Minimum Views: Individual Posts** A post must reach at least 1000 views before those views count toward your total.\n" +
+        "**Payout Timelines** Payments are not sent immediately. The campaign must end first, then posts are reviewed, and the sponsor must approve the results.\n" +
+        "**Payment Method** You are paid only through the method chosen by the campaign, such as PayPal.\n" +
+        "**Payment Details** Your payout is sent to the payment information saved at the end of the campaign. If the payment is delivered but you cannot withdraw it, you must fix that issue yourself."
       )
       .setFooter({ text: 'Underclips Campaign Info' });
 
     await campaignInfoChannel.send({ embeds: [payoutEmbed] });
   }
 
-  // 📜 CAMPAIGN RULES EMBED (MATCHES RULES STYLE)
+  // 📜 CAMPAIGN RULES — SPACING MATCHES CAMPAIGN INFO
   const campaignRulesChannel = await client.channels.fetch(CAMPAIGN_RULES_CHANNEL_ID);
   const campaignRulesMessages = await campaignRulesChannel.messages.fetch({ limit: 20 });
   const campaignRulesExisting = campaignRulesMessages.find(
@@ -130,13 +118,13 @@ client.once('ready', async () => {
       .setColor('#2b2d31')
       .setTitle('📜 Campaign Rules')
       .setDescription(
-        "**No Botting or Fake Engagement** All engagement must be real. Bots or fake groups are not allowed.\n\n" +
-        "**Audience Must Match the Campaign** Only join campaigns that fit your audience. If a campaign needs an English audience, at least 50% of your audience must be English‑speaking.\n\n" +
-        "**Posts Must Follow Campaign Requirements** Posts that break or ignore campaign requirements will not be accepted.\n\n" +
-        "**Do Not Hide Engagement Metrics** Likes, views, comments, and other engagement numbers must stay visible.\n\n" +
-        "**No Low‑Effort or Auto‑Generated Posts** Posts that look rushed, auto‑made, or low quality are not allowed.\n\n" +
-        "**No Posting the Same Content Twice** Do not upload the same post multiple times on the same account. Each post must be unique.\n\n" +
-        "**Posts Must Stay Public Until Payment** Your post must remain public until the payout is sent.\n\n" +
+        "**No Botting or Fake Engagement** All engagement must be real. Bots or fake groups are not allowed.\n" +
+        "**Audience Must Match the Campaign** Only join campaigns that fit your audience. If a campaign needs an English audience, at least 50% of your audience must be English‑speaking.\n" +
+        "**Posts Must Follow Campaign Requirements** Posts that break or ignore campaign requirements will not be accepted.\n" +
+        "**Do Not Hide Engagement Metrics** Likes, views, comments, and other engagement numbers must stay visible.\n" +
+        "**No Low‑Effort or Auto‑Generated Posts** Posts that look rushed, auto‑made, or low quality are not allowed.\n" +
+        "**No Posting the Same Content Twice** Do not upload the same post multiple times on the same account. Each post must be unique.\n" +
+        "**Posts Must Stay Public Until Payment** Your post must remain public until the payout is sent.\n" +
         "**Staff Decisions Are Final** Breaking rules gives staff full authority to take action when needed."
       )
       .setFooter({ text: 'Underclips Campaign Rules' });
