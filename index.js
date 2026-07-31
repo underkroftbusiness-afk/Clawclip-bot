@@ -63,16 +63,16 @@ client.once('ready', async () => {
       .setColor('#2b2d31')
       .setTitle('📜 Rules')
       .setDescription(
-        "**1. Respect Everyone** Treat all members with respect. No toxicity, bullying, discrimination, or drama. Keep conversations friendly and mature.\n" +
-        "**2. No Spam** Avoid flooding chats with repeated messages, caps, or random pings. Keep the chat readable for everyone.\n" +
-        "**3. Stay On Topic** Use each channel for its purpose. It helps keep the server organized and easy to navigate.\n" +
-        "**4. No NSFW** Sexual content, gore, or anything unsafe is strictly forbidden. This server must stay safe for all users.\n" +
-        "**5. No Self‑Promo** Don’t advertise socials, servers, or services unless staff approves it. Keep focus on clipping and growth.\n" +
-        "**6. Follow Staff** Admins and moderators make final decisions. Cooperate when asked and respect their guidance.\n" +
-        "**7. Keep It Safe** No threats, harassment, or sharing private info. Everyone should feel safe here.\n" +
-        "**8. No Illegal Content** No hacks, cheats, scams, or leaked files. Don’t share or request pirated material.\n" +
-        "**9. No Doxing** Never share private info — names, addresses, numbers, schools, workplaces, IPs, anything personal.\n" +
-        "**10. Discord Guidelines** Follow Discord’s Terms of Service and Community Guidelines at all times."
+  "**1. Respect Everyone** Be kind, no hate or drama.\n" +
+  "**2. No Spam** Don’t flood chats or ping spam.\n" +
+  "**3. Stay On Topic** Use channels correctly.\n" +
+  "**4. No NSFW** No sexual or violent content.\n" +
+  "**5. No Self‑Promo** Don’t advertise without staff approval.\n" +
+  "**6. Follow Staff** Respect admin and mod decisions.\n" +
+  "**7. Keep It Safe** No threats or private info.\n" +
+  "**8. No Illegal Content** No hacks, scams, or leaks.\n" +
+  "**9. No Doxing** Don’t share personal info.\n" +
+  "**10. Discord Guidelines** Follow Discord’s ToS and rules."
       )
       .setFooter({ text: 'Underclips Server Rules' });
 
