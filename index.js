@@ -5,7 +5,8 @@ const {
   ActionRowBuilder, 
   ButtonBuilder, 
   ButtonStyle,
-  EmbedBuilder
+  EmbedBuilder,
+  PermissionsBitField
 } = require('discord.js');
 
 const client = new Client({
@@ -23,7 +24,7 @@ const SUPPORT_CHANNEL_ID = "1516092800469303437";
 const RULES_CHANNEL_ID = "1516812179410780261";
 
 // ✅ Bot online
-client.once('clientReady', async () => {
+client.once('ready', async () => {
   console.log(`Bot is online as ${client.user.tag}`);
 
   // 🎟️ Support message
@@ -50,7 +51,7 @@ client.once('clientReady', async () => {
     await supportChannel.send({ embeds: [embed], components: [row] });
   }
 
-  // 📜 RULES MESSAGE (SUPER COMPACT)
+  // 📜 RULES MESSAGE (COMPACT)
   const rulesChannel = await client.channels.fetch(RULES_CHANNEL_ID);
   const rulesMessages = await rulesChannel.messages.fetch({ limit: 20 });
   const rulesExisting = rulesMessages.find(
@@ -60,18 +61,18 @@ client.once('clientReady', async () => {
   if (!rulesExisting) {
     const rulesEmbed = new EmbedBuilder()
       .setColor('#2b2d31')
-      .setTitle('rules📜')
+      .setTitle('📜 Rules')
       .setDescription(
-        "**1. Respect Everyone**\nTreat everyone normally. No toxicity, hate, or insults."
-        + "\n**2. No Spam**\nNo spam, caps spam, ping spam, or repeated messages."
-        + "\n**3. Stay On Topic**\nUse channels for their intended purpose."
-        + "\n**4. No NSFW**\nNo NSFW, gore, or inappropriate content."
-        + "\n**5. No Self‑Promo**\nNo advertising your socials, servers, or services."
-        + "\n**6. Follow Staff**\nFollow instructions from admins and moderators."
-        + "\n**7. Keep It Safe**\nNo threats, no sharing private info, no unsafe behavior."
-        + "\n**8. No Illegal Content**\nNo hacks, scams, leaks, or illegal downloads."
-        + "\n**9. No Doxing**\nDo not share anyone’s private information — addresses, numbers, names, school, workplace, IPs, anything."
-        + "\n**10. Follow Discord Guidelines**\nWe follow the official Discord Terms of Service and Community Guidelines."
+        "**1. Respect Everyone** Treat everyone normally. No toxicity, hate, or insults.\n" +
+        "**2. No Spam** No spam, caps spam, ping spam, or repeated messages.\n" +
+        "**3. Stay On Topic** Use channels for their intended purpose.\n" +
+        "**4. No NSFW** No NSFW, gore, or inappropriate content.\n" +
+        "**5. No Self‑Promo** No advertising your socials, servers, or services.\n" +
+        "**6. Follow Staff** Follow instructions from admins and moderators.\n" +
+        "**7. Keep It Safe** No threats, no sharing private info, no unsafe behavior.\n" +
+        "**8. No Illegal Content** No hacks, scams, leaks, or illegal downloads.\n" +
+        "**9. No Doxing** Do not share anyone’s private information — addresses, numbers, names, school, workplace, IPs, anything.\n" +
+        "**10. Follow Discord Guidelines** We follow the official Discord Terms of Service and Community Guidelines."
       )
       .setFooter({ text: 'Underclips Server Rules' });
 
@@ -101,21 +102,37 @@ client.on('interactionCreate', async (interaction) => {
 
       const ticketChannel = await interaction.guild.channels.create({
         name: `ticket-${interaction.user.username}`,
-        type: 0,
+        type: 0, // Text channel
         topic: `Support ticket for ${interaction.user.tag}`,
         permissionOverwrites: [
-          { id: interaction.guild.roles.everyone, deny: ['ViewChannel'] },
-          { id: interaction.user.id, allow: ['ViewChannel', 'SendMessages'] }
+          {
+            id: interaction.guild.roles.everyone,
+            deny: [PermissionsBitField.Flags.ViewChannel]
+          },
+          {
+            id: interaction.user.id,
+            allow: [
+              PermissionsBitField.Flags.ViewChannel,
+              PermissionsBitField.Flags.SendMessages,
+              PermissionsBitField.Flags.ReadMessageHistory
+            ]
+          },
+          {
+            id: client.user.id,
+            allow: [
+              PermissionsBitField.Flags.ViewChannel,
+              PermissionsBitField.Flags.SendMessages,
+              PermissionsBitField.Flags.ManageChannels,
+              PermissionsBitField.Flags.EmbedLinks
+            ]
+          }
         ]
       });
 
       const ticketEmbed = new EmbedBuilder()
         .setColor('#2b2d31')
         .setTitle('🎫 Ticket Created')
-        .setDescription(
-          `Welcome <@${interaction.user.id}>!\nSomeone will help you shortly.\n` +
-          "If your issue is solved, press the button below to close your ticket."
-        )
+        .setDescription(`Welcome <@${interaction.user.id}>! Someone will help you shortly.\nIf your issue is solved, press the button below to close your ticket.`)
         .setFooter({ text: 'Underclips Support' });
 
       const closeRow = new ActionRowBuilder().addComponents(
@@ -135,19 +152,20 @@ client.on('interactionCreate', async (interaction) => {
     } catch (err) {
       console.error(err);
       await interaction.editReply({
-        content: '⚠️ Something went wrong while creating your ticket.\nMake sure the bot has **Manage Channels** permission.',
+        content: '⚠️ Something went wrong while creating your ticket.\nMake sure the bot has **Manage Channels** and **View Channel** permissions.',
         ephemeral: true
       });
     }
   }
 
-  // 🔒 Close ticket
+  // 🔒 Close ticket (user or staff)
   if (interaction.customId === 'close_ticket') {
     const channel = interaction.channel;
     const isOwner = channel.name.includes(interaction.user.username);
 
-    if (!isOwner) {
-      return interaction.reply({ content: "Only the ticket owner can close this.", ephemeral: true });
+    // ✅ Allow ticket owner OR staff to close
+    if (!isOwner && !interaction.member.permissions.has(PermissionsBitField.Flags.ManageChannels)) {
+      return interaction.reply({ content: "Only the ticket owner or staff can close this.", ephemeral: true });
     }
 
     await interaction.reply({ content: "Ticket closed. Deleting in 3 seconds...", ephemeral: true });
@@ -162,6 +180,7 @@ client.on('messageCreate', (message) => {
 
 // 🔑 Login
 client.login(process.env.DISCORD_TOKEN);
+
 
 
 
