@@ -51,7 +51,7 @@ client.once('ready', async () => {
     await supportChannel.send({ embeds: [embed], components: [row] });
   }
 
-  // 📜 RULES MESSAGE (COMPACT)
+  // 📜 RULES MESSAGE (SUPER COMPACT)
   const rulesChannel = await client.channels.fetch(RULES_CHANNEL_ID);
   const rulesMessages = await rulesChannel.messages.fetch({ limit: 20 });
   const rulesExisting = rulesMessages.find(
@@ -107,7 +107,10 @@ client.on('interactionCreate', async (interaction) => {
         permissionOverwrites: [
           {
             id: interaction.guild.roles.everyone,
-            deny: [PermissionsBitField.Flags.ViewChannel]
+            deny: [
+              PermissionsBitField.Flags.ViewChannel,
+              PermissionsBitField.Flags.SendMessages
+            ]
           },
           {
             id: interaction.user.id,
@@ -145,27 +148,26 @@ client.on('interactionCreate', async (interaction) => {
       await ticketChannel.send({ embeds: [ticketEmbed], components: [closeRow] });
 
       await interaction.editReply({
-        content: `✅ Your ticket has been created: ${ticketChannel}`,
+        content: `✅ Your ticket has been been created: ${ticketChannel}`,
         ephemeral: true
       });
 
     } catch (err) {
       console.error(err);
       await interaction.editReply({
-        content: '⚠️ Something went wrong while creating your ticket.\nMake sure the bot has **Manage Channels** and **View Channel** permissions.',
+        content: '⚠️ Something went wrong while creating your ticket.\nMake sure the bot has **Manage Channels** permission.',
         ephemeral: true
       });
     }
   }
 
-  // 🔒 Close ticket (user or staff)
+  // 🔒 Close ticket (user can close)
   if (interaction.customId === 'close_ticket') {
     const channel = interaction.channel;
     const isOwner = channel.name.includes(interaction.user.username);
 
-    // ✅ Allow ticket owner OR staff to close
-    if (!isOwner && !interaction.member.permissions.has(PermissionsBitField.Flags.ManageChannels)) {
-      return interaction.reply({ content: "Only the ticket owner or staff can close this.", ephemeral: true });
+    if (!isOwner) {
+      return interaction.reply({ content: "Only the ticket owner can close this.", ephemeral: true });
     }
 
     await interaction.reply({ content: "Ticket closed. Deleting in 3 seconds...", ephemeral: true });
@@ -180,6 +182,7 @@ client.on('messageCreate', (message) => {
 
 // 🔑 Login
 client.login(process.env.DISCORD_TOKEN);
+
 
 
 
