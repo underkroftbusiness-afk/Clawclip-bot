@@ -22,6 +22,7 @@ const client = new Client({
 // 🧩 CHANGE THESE
 const SUPPORT_CHANNEL_ID = "1516092800469303437";
 const RULES_CHANNEL_ID = "1516812179410780261";
+const CAMPAIGN_INFO_CHANNEL_ID = "1515782662412046416";
 
 // ✅ Bot online
 client.once('ready', async () => {
@@ -51,7 +52,7 @@ client.once('ready', async () => {
     await supportChannel.send({ embeds: [embed], components: [row] });
   }
 
-  // 📜 RULES MESSAGE (LONGER VERSION YOU ASKED FOR)
+  // 📜 RULES MESSAGE
   const rulesChannel = await client.channels.fetch(RULES_CHANNEL_ID);
   const rulesMessages = await rulesChannel.messages.fetch({ limit: 20 });
   const rulesExisting = rulesMessages.find(
@@ -78,110 +79,50 @@ client.once('ready', async () => {
 
     await rulesChannel.send({ embeds: [rulesEmbed] });
   }
+
+  // 📢 CAMPAIGN INFO MESSAGE
+  const campaignInfoChannel = await client.channels.fetch(CAMPAIGN_INFO_CHANNEL_ID);
+  const campaignMessages = await campaignInfoChannel.messages.fetch({ limit: 20 });
+  const campaignExisting = campaignMessages.find(
+    m => m.author.id === client.user.id && m.embeds.length > 0
+  );
+
+  if (!campaignExisting) {
+    const campaignEmbed = new EmbedBuilder()
+      .setColor('#2b2d31')
+      .setTitle('💰 Payout Calculation')
+      .setDescription(
+        "**Campaigns use two systems to calculate payment.**\n\n" +
+
+        "**Payrate Based System**\n" +
+        "Pays a fixed amount for your views. Example: if the rate is $1 per 1,000 views, you earn $1 every time you reach 1,000 views.\n\n" +
+
+        "**The Pot Style System**\n" +
+        "Pays you based on your share of all views in the campaign. If you produce 20% of the total views, you receive 20% of the total budget. We take 30% of your earnings (30% of your 20% share).\n\n" +
+
+        "**Minimum Views (Individual Posts)**\n" +
+        "A post must reach at least 1,000 views before those views count toward your total.\n\n" +
+
+        "**Payout Timelines**\n" +
+        "Payments are not sent immediately. The campaign must end first, then posts are reviewed, and the sponsor must approve the results.\n\n" +
+
+        "**Payment Method**\n" +
+        "You are paid only through the method chosen by the campaign (e.g., PayPal).\n\n" +
+
+        "**Payment Details**\n" +
+        "Your payout is sent to the payment information saved at the end of the campaign. If the payment is delivered but you cannot withdraw it, you must fix that issue yourself."
+      )
+      .setFooter({ text: 'Underclips Campaign Info' });
+
+    await campaignInfoChannel.send({ embeds: [campaignEmbed] });
+  }
 });
 
 // 💬 Auto‑DM when someone joins
 client.on('guildMemberAdd', async (member) => {
   try {
     await member.send(
-      `👋 Welcome to Underclips — The Clipping Server That Helps You!\n\nUnderclips is a place made for people who clip. You join, you get support, you grow, and you find chances to earn more from your content. It’s a server built to make clipping easier and help you improve.`
-    );
-  } catch {
-    console.log('Could not send DM.');
-  }
-});
-
-// 🎟️ Ticket creation & closing
-client.on('interactionCreate', async (interaction) => {
-  if (!interaction.isButton()) return;
-
-  // 🟢 Create ticket
-  if (interaction.customId === 'create_ticket') {
-    try {
-      await interaction.deferReply({ ephemeral: true });
-
-      const ticketChannel = await interaction.guild.channels.create({
-        name: `ticket-${interaction.user.username}`,
-        type: 0, // Text channel
-        topic: `Support ticket for ${interaction.user.tag}`,
-        permissionOverwrites: [
-          {
-            id: interaction.guild.roles.everyone,
-            deny: [
-              PermissionsBitField.Flags.ViewChannel,
-              PermissionsBitField.Flags.SendMessages
-            ]
-          },
-          {
-            id: interaction.user.id,
-            allow: [
-              PermissionsBitField.Flags.ViewChannel,
-              PermissionsBitField.Flags.SendMessages,
-              PermissionsBitField.Flags.ReadMessageHistory
-            ]
-          },
-          {
-            id: client.user.id,
-            allow: [
-              PermissionsBitField.Flags.ViewChannel,
-              PermissionsBitField.Flags.SendMessages,
-              PermissionsBitField.Flags.ManageChannels,
-              PermissionsBitField.Flags.EmbedLinks
-            ]
-          }
-        ]
-      });
-
-      const ticketEmbed = new EmbedBuilder()
-        .setColor('#2b2d31')
-        .setTitle('🎫 Ticket Created')
-        .setDescription(`Welcome <@${interaction.user.id}>! Someone will help you shortly.\nIf your issue is solved, press the button below to close your ticket.`)
-        .setFooter({ text: 'Underclips Support' });
-
-      const closeRow = new ActionRowBuilder().addComponents(
-        new ButtonBuilder()
-          .setCustomId('close_ticket')
-          .setLabel('🔒 Close Ticket')
-          .setStyle(ButtonStyle.Danger)
-      );
-
-      await ticketChannel.send({ embeds: [ticketEmbed], components: [closeRow] });
-
-      await interaction.editReply({
-        content: `✅ Your ticket has been been created: ${ticketChannel}`,
-        ephemeral: true
-      });
-
-    } catch (err) {
-      console.error(err);
-      await interaction.editReply({
-        content: '⚠️ Something went wrong while creating your ticket.\nMake sure the bot has **Manage Channels** permission.',
-        ephemeral: true
-      });
-    }
-  }
-
-  // 🔒 Close ticket (user can close)
-  if (interaction.customId === 'close_ticket') {
-    const channel = interaction.channel;
-    const isOwner = channel.name.includes(interaction.user.username);
-
-    if (!isOwner) {
-      return interaction.reply({ content: "Only the ticket owner can close this.", ephemeral: true });
-    }
-
-    await interaction.reply({ content: "Ticket closed. Deleting in 3 seconds...", ephemeral: true });
-    setTimeout(() => channel.delete().catch(() => {}), 3000);
-  }
-});
-
-// 🏓 Ping command
-client.on('messageCreate', (message) => {
-  if (message.content === '!ping') message.reply('Pong!');
-});
-
-// 🔑 Login
-client.login(process.env.DISCORD_TOKEN);
+      `👋 Welcome to Underclips —
 
 
 
