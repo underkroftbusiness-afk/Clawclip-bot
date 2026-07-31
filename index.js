@@ -51,7 +51,7 @@ client.once('ready', async () => {
     await supportChannel.send({ embeds: [embed], components: [row] });
   }
 
-  // 📜 RULES MESSAGE (UPDATED TEXT ONLY)
+  // 📜 RULES MESSAGE (LONGER VERSION YOU ASKED FOR)
   const rulesChannel = await client.channels.fetch(RULES_CHANNEL_ID);
   const rulesMessages = await rulesChannel.messages.fetch({ limit: 20 });
   const rulesExisting = rulesMessages.find(
@@ -63,16 +63,16 @@ client.once('ready', async () => {
       .setColor('#2b2d31')
       .setTitle('📜 Rules')
       .setDescription(
-  "**1. Respect Everyone** Be kind, no hate or drama.\n" +
-  "**2. No Spam** Don’t flood chats or ping spam.\n" +
-  "**3. Stay On Topic** Use channels correctly.\n" +
-  "**4. No NSFW** No sexual or violent content.\n" +
-  "**5. No Self‑Promo** Don’t advertise without staff approval.\n" +
-  "**6. Follow Staff** Respect admin and mod decisions.\n" +
-  "**7. Keep It Safe** No threats or private info.\n" +
-  "**8. No Illegal Content** No hacks, scams, or leaks.\n" +
-  "**9. No Doxing** Don’t share personal info.\n" +
-  "**10. Discord Guidelines** Follow Discord’s ToS and rules."
+        "**1. Respect Everyone** Treat people normally. No toxicity, hate, bullying, or trying to start drama.\n" +
+        "**2. No Spam** Don’t flood chats with messages, caps, pings, or repeated content. Keep conversations readable.\n" +
+        "**3. Stay On Topic** Use each channel for what it’s meant for. It keeps the server clean and easy to navigate.\n" +
+        "**4. No NSFW** No sexual content, gore, shock content, or anything unsafe for younger users.\n" +
+        "**5. No Self‑Promo** Don’t advertise your socials, Discord servers, or services unless staff approves it.\n" +
+        "**6. Follow Staff** Admins and moderators make final decisions. Listen to instructions and cooperate.\n" +
+        "**7. Keep It Safe** No threats, harassment, or sharing private info. Keep the community safe for everyone.\n" +
+        "**8. No Illegal Content** No hacks, cheats, scams, leaked files, or anything that breaks laws or Discord rules.\n" +
+        "**9. No Doxing** Never share someone’s private info — names, addresses, numbers, school, workplace, IPs, anything.\n" +
+        "**10. Discord Guidelines** This server follows Discord’s Terms of Service and Community Guidelines."
       )
       .setFooter({ text: 'Underclips Server Rules' });
 
@@ -102,7 +102,7 @@ client.on('interactionCreate', async (interaction) => {
 
       const ticketChannel = await interaction.guild.channels.create({
         name: `ticket-${interaction.user.username}`,
-        type: 0,
+        type: 0, // Text channel
         topic: `Support ticket for ${interaction.user.tag}`,
         permissionOverwrites: [
           {
@@ -148,7 +148,7 @@ client.on('interactionCreate', async (interaction) => {
       await ticketChannel.send({ embeds: [ticketEmbed], components: [closeRow] });
 
       await interaction.editReply({
-        content: `✅ Your ticket has been created: ${ticketChannel}`,
+        content: `✅ Your ticket has been been created: ${ticketChannel}`,
         ephemeral: true
       });
 
@@ -161,7 +161,7 @@ client.on('interactionCreate', async (interaction) => {
     }
   }
 
-  // 🔒 Close ticket
+  // 🔒 Close ticket (user can close)
   if (interaction.customId === 'close_ticket') {
     const channel = interaction.channel;
     const isOwner = channel.name.includes(interaction.user.username);
