@@ -62,17 +62,17 @@ client.once('ready', async () => {
     const rulesEmbed = new EmbedBuilder()
       .setColor('#2b2d31')
       .setTitle('📜 Rules')
-  .setDescription(
-  "• **Respect Everyone** — No toxicity or hate.\n" +
-  "• **No Spam** — No caps, ping spam, or repeats.\n" +
-  "• **Stay On Topic** — Use channels correctly.\n" +
-  "• **No NSFW** — No NSFW or gore.\n" +
-  "• **No Self‑Promo** — No advertising.\n" +
-  "• **Follow Staff** — Listen to admins/mods.\n" +
-  "• **Keep It Safe** — No threats or unsafe behavior.\n" +
-  "• **No Illegal Content** — No hacks, scams, or leaks.\n" +
-  "• **No Doxing** — Don’t share private info.\n" +
-  "• **Follow Discord Guidelines** — Follow ToS & Community Guidelines."
+ .setDescription(
+  "**1. Respect Everyone** Treat people normally. No toxicity, hate, bullying, or trying to start drama.\n" +
+  "**2. No Spam** Don’t flood chats with messages, caps, pings, or repeated content. Keep conversations readable.\n" +
+  "**3. Stay On Topic** Use each channel for what it’s meant for. It keeps the server clean and easy to navigate.\n" +
+  "**4. No NSFW** No sexual content, gore, shock content, or anything unsafe for younger users.\n" +
+  "**5. No Self‑Promo** Don’t advertise your socials, Discord servers, or services unless staff approves it.\n" +
+  "**6. Follow Staff** Admins and moderators make final decisions. Listen to instructions and cooperate.\n" +
+  "**7. Keep It Safe** No threats, harassment, or sharing private info. Keep the community safe for everyone.\n" +
+  "**8. No Illegal Content** No hacks, cheats, scams, leaked files, or anything that breaks laws or Discord rules.\n" +
+  "**9. No Doxing** Never share someone’s private info — names, addresses, numbers, school, workplace, IPs, anything.\n" +
+  "**10. Discord Guidelines** This server follows Discord’s Terms of Service and Community Guidelines."
       )
       .setFooter({ text: 'Underclips Server Rules' });
 
