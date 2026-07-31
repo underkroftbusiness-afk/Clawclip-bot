@@ -93,19 +93,118 @@ client.once('ready', async () => {
       .setColor('#2b2d31')
       .setTitle('💰 Payout Calculation')
       .setDescription(
-        "**Campaigns use two systems to calculate paymement.**\n\n" +
+        "**Campaigns use two systems to calculate payment.**\n\n" +
 
         "**Payrate Based System**\n" +
-        "pays a fixed amount for your views. You earn the same amount every time you reach the required number of views. Example: if the rate is one dollar per one thousand views, you receive one dollar for every one thousand views you generate.\n\n" +
+        "Pays a fixed amount for your views. You earn the same amount every time you reach the required number of views. Example: if the rate is one dollar per one thousand views, you receive one dollar for every one thousand views you generate.\n\n" +
 
         "**The Pot Style System**\n" +
-        "pays you based on your share of all views in the campaign. If you produce 20% percent of the total views, you receive 20% percent of the total budget. We take 30% of your earnings, so I get 30% of your 20% share.\n\n" +
+        "Pays you based on your share of all views in the campaign. If you produce 20% of the total views, you receive 20% of the total budget. We take 30% of your earnings, so I get 30% of your 20% share.\n\n" +
 
         "**Minimum Views: Individual Posts**\n" +
-        "A post must reach at least one 1000 views before those views count toward your total.\n\n" +
+        "A post must reach at least 1000 views before those views count toward your total.\n\n" +
 
-        "**Payout Timelines
+        "**Payout Timelines**\n" +
+        "Payments are not sent immediately. The campaign must end first, then posts are reviewed, and the sponsor must approve the results.\n\n" +
 
+        "**Payment Method**\n" +
+        "You are paid only through the method chosen by the campaign, such as PayPal.\n\n" +
+
+        "**Payment Details**\n" +
+        "Your payout is sent to the payment information saved at the end of the campaign. If the payment is delivered but you cannot withdraw it, you must fix that issue yourself."
+      )
+      .setFooter({ text: 'Underclips Campaign Info' });
+
+    await campaignInfoChannel.send({ embeds: [payoutEmbed] });
+  }
+
+  // 📜 SHORTENED CAMPAIGN RULES EMBED (NEW)
+  const campaignRulesChannel = await client.channels.fetch(CAMPAIGN_RULES_CHANNEL_ID);
+  const campaignRulesMessages = await campaignRulesChannel.messages.fetch({ limit: 20 });
+  const campaignRulesExisting = campaignRulesMessages.find(
+    m => m.author.id === client.user.id && m.embeds.length > 0
+  );
+
+  if (!campaignRulesExisting) {
+    const campaignRulesEmbed = new EmbedBuilder()
+      .setColor('#2b2d31')
+      .setTitle('📜 Shortened Campaign Rules')
+      .setDescription(
+        "**No Botting or Fake Engagement**\n" +
+        "All engagement must be real. Bots or fake groups are not allowed.\n\n" +
+
+        "**Audience Must Match the Campaign**\n" +
+        "Only join campaigns that fit your audience. If a campaign needs an English audience, at least 50% of your audience must be English‑speaking.\n\n" +
+
+        "**Posts Must Follow Campaign Requirements**\n" +
+        "Your post must match all campaign rules. Breaking requirements means the post won’t be accepted.\n\n" +
+
+        "**Do Not Hide Engagement Metrics**\n" +
+        "Likes, views, and comments must stay visible. No hiding metrics.\n\n" +
+
+        "**No Low‑Effort or Auto‑Generated Posts**\n" +
+        "Posts must be real, high‑quality, and not auto‑generated. Low‑effort content can lead to removal.\n\n" +
+
+        "**No Duplicate Posts**\n" +
+        "Do not upload the same post multiple times on the same account. Each post must be unique.\n\n" +
+
+        "**Posts Must Stay Public Until Payment**\n" +
+        "Your post must remain public until payment is sent. Clients may check results even after the campaign ends.\n\n" +
+
+        "**Staff Decisions Are Final**\n" +
+        "Breaking rules gives staff full authority to take action when needed."
+      )
+      .setFooter({ text: 'Underclips Campaign Rules' });
+
+    await campaignRulesChannel.send({ embeds: [campaignRulesEmbed] });
+  }
+});
+
+// 💬 Auto‑DM when someone joins
+client.on('guildMemberAdd', async (member) => {
+  try {
+    await member.send(
+      `👋 Welcome to Underclips — The Clipping Server That Helps You!\n\nUnderclips is a place made for people who clip. You join, you get support, you grow, and you find chances to earn more from your content. It’s a server built to make clipping easier and help you improve.`
+    );
+  } catch {
+    console.log('Could not send DM.');
+  }
+});
+
+// 🎟️ Ticket creation & closing
+client.on('interactionCreate', async (interaction) => {
+  if (!interaction.isButton()) return;
+
+  if (interaction.customId === 'create_ticket') {
+    try {
+      await interaction.deferReply({ ephemeral: true });
+
+      const ticketChannel = await interaction.guild.channels.create({
+        name: `ticket-${interaction.user.username}`,
+        type: 0,
+        topic: `Support ticket for ${interaction.user.tag}`,
+        permissionOverwrites: [
+          {
+            id: interaction.guild.roles.everyone,
+            deny: [
+              PermissionsBitField.Flags.ViewChannel,
+              PermissionsBitField.Flags.SendMessages
+            ]
+          },
+          {
+            id: interaction.user.id,
+            allow: [
+              PermissionsBitField.Flags.ViewChannel,
+              PermissionsBitField.Flags.SendMessages,
+              PermissionsBitField.Flags.ReadMessageHistory
+            ]
+          },
+          {
+            id: client.user.id,
+            allow: [
+              PermissionsBitField.Flags.ViewChannel,
+              PermissionsBitField.Flags.SendMessages,
+              PermissionsBitField.Flags.Man
 
 
 
