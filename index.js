@@ -81,7 +81,7 @@ client.once('ready', async () => {
     await rulesChannel.send({ embeds: [rulesEmbed] });
   }
 
-  // 💰 PAYOUT INFO EMBED
+  // 💰 PAYOUT INFO EMBED (FIXED SPACING + BLACK BACKGROUND)
   const campaignInfoChannel = await client.channels.fetch(CAMPAIGN_INFO_CHANNEL_ID);
   const campaignMessages = await campaignInfoChannel.messages.fetch({ limit: 20 });
   const campaignExisting = campaignMessages.find(
@@ -118,7 +118,7 @@ client.once('ready', async () => {
     await campaignInfoChannel.send({ embeds: [payoutEmbed] });
   }
 
-  // 📜 SHORTENED CAMPAIGN RULES EMBED (NEW)
+  // 📜 CAMPAIGN RULES EMBED (MATCHES RULES STYLE)
   const campaignRulesChannel = await client.channels.fetch(CAMPAIGN_RULES_CHANNEL_ID);
   const campaignRulesMessages = await campaignRulesChannel.messages.fetch({ limit: 20 });
   const campaignRulesExisting = campaignRulesMessages.find(
@@ -128,31 +128,16 @@ client.once('ready', async () => {
   if (!campaignRulesExisting) {
     const campaignRulesEmbed = new EmbedBuilder()
       .setColor('#2b2d31')
-      .setTitle('📜 Shortened Campaign Rules')
+      .setTitle('📜 Campaign Rules')
       .setDescription(
-        "**No Botting or Fake Engagement**\n" +
-        "All engagement must be real. Bots or fake groups are not allowed.\n\n" +
-
-        "**Audience Must Match the Campaign**\n" +
-        "Only join campaigns that fit your audience. If a campaign needs an English audience, at least 50% of your audience must be English‑speaking.\n\n" +
-
-        "**Posts Must Follow Campaign Requirements**\n" +
-        "Your post must match all campaign rules. Breaking requirements means the post won’t be accepted.\n\n" +
-
-        "**Do Not Hide Engagement Metrics**\n" +
-        "Likes, views, and comments must stay visible. No hiding metrics.\n\n" +
-
-        "**No Low‑Effort or Auto‑Generated Posts**\n" +
-        "Posts must be real, high‑quality, and not auto‑generated. Low‑effort content can lead to removal.\n\n" +
-
-        "**No Duplicate Posts**\n" +
-        "Do not upload the same post multiple times on the same account. Each post must be unique.\n\n" +
-
-        "**Posts Must Stay Public Until Payment**\n" +
-        "Your post must remain public until payment is sent. Clients may check results even after the campaign ends.\n\n" +
-
-        "**Staff Decisions Are Final**\n" +
-        "Breaking rules gives staff full authority to take action when needed."
+        "**No Botting or Fake Engagement** All engagement must be real. Bots or fake groups are not allowed.\n\n" +
+        "**Audience Must Match the Campaign** Only join campaigns that fit your audience. If a campaign needs an English audience, at least 50% of your audience must be English‑speaking.\n\n" +
+        "**Posts Must Follow Campaign Requirements** Posts that break or ignore campaign requirements will not be accepted.\n\n" +
+        "**Do Not Hide Engagement Metrics** Likes, views, comments, and other engagement numbers must stay visible.\n\n" +
+        "**No Low‑Effort or Auto‑Generated Posts** Posts that look rushed, auto‑made, or low quality are not allowed.\n\n" +
+        "**No Posting the Same Content Twice** Do not upload the same post multiple times on the same account. Each post must be unique.\n\n" +
+        "**Posts Must Stay Public Until Payment** Your post must remain public until the payout is sent.\n\n" +
+        "**Staff Decisions Are Final** Breaking rules gives staff full authority to take action when needed."
       )
       .setFooter({ text: 'Underclips Campaign Rules' });
 
@@ -204,7 +189,62 @@ client.on('interactionCreate', async (interaction) => {
             allow: [
               PermissionsBitField.Flags.ViewChannel,
               PermissionsBitField.Flags.SendMessages,
-              PermissionsBitField.Flags
+              PermissionsBitField.Flags.ManageChannels,
+              PermissionsBitField.Flags.EmbedLinks
+            ]
+          }
+        ]
+      });
+
+      const ticketEmbed = new EmbedBuilder()
+        .setColor('#2b2d31')
+        .setTitle('🎫 Ticket Created')
+        .setDescription(`Welcome <@${interaction.user.id}>! Someone will help you shortly.\nIf your issue is solved, press the button below to close your ticket.`)
+        .setFooter({ text: 'Underclips Support' });
+
+      const closeRow = new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+          .setCustomId('close_ticket')
+          .setLabel('🔒 Close Ticket')
+          .setStyle(ButtonStyle.Danger)
+      );
+
+      await ticketChannel.send({ embeds: [ticketEmbed], components: [closeRow] });
+
+      await interaction.editReply({
+        content: `✅ Your ticket has been created: ${ticketChannel}`,
+        ephemeral: true
+      });
+
+    } catch (err) {
+      console.error(err);
+      await interaction.editReply({
+        content: '⚠️ Something went wrong while creating your ticket.\nMake sure the bot has **Manage Channels** permission.',
+        ephemeral: true
+      });
+    }
+  }
+
+  if (interaction.customId === 'close_ticket') {
+    const channel = interaction.channel;
+    const isOwner = channel.name.includes(interaction.user.username);
+
+    if (!isOwner) {
+      return interaction.reply({ content: "Only the ticket owner can close this.", ephemeral: true });
+    }
+
+    await interaction.reply({ content: "Ticket closed. Deleting in 3 seconds...", ephemeral: true });
+    setTimeout(() => channel.delete().catch(() => {}), 3000);
+  }
+});
+
+// 🏓 Ping command
+client.on('messageCreate', (message) => {
+  if (message.content === '!ping') message.reply('Pong!');
+});
+
+// 🔑 Login
+client.login(process.env.DISCORD_TOKEN);
 
 
 
