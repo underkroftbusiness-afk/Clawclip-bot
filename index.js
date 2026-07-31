@@ -62,17 +62,17 @@ client.once('ready', async () => {
     const rulesEmbed = new EmbedBuilder()
       .setColor('#2b2d31')
       .setTitle('📜 Rules')
-      .setDescription(
-        "**1. Respect Everyone** Treat everyone normally. No toxicity, hate, or insults.\n" +
-        "**2. No Spam** No spam, caps spam, ping spam, or repeated messages.\n" +
-        "**3. Stay On Topic** Use channels for their intended purpose.\n" +
-        "**4. No NSFW** No NSFW, gore, or inappropriate content.\n" +
-        "**5. No Self‑Promo** No advertising your socials, servers, or services.\n" +
-        "**6. Follow Staff** Follow instructions from admins and moderators.\n" +
-        "**7. Keep It Safe** No threats, no sharing private info, no unsafe behavior.\n" +
-        "**8. No Illegal Content** No hacks, scams, leaks, or illegal downloads.\n" +
-        "**9. No Doxing** Do not share anyone’s private information — addresses, numbers, names, school, workplace, IPs, anything.\n" +
-        "**10. Follow Discord Guidelines** We follow the official Discord Terms of Service and Community Guidelines."
+     .setDescription(
+  "**1. Respect Everyone** Treat everyone normally. No toxicity, hate, or insults.\n" +
+  "**2. No Spam** No spam, caps spam, ping spam, or repeated messages.\n" +
+  "**3. Stay On Topic** Use channels for their intended purpose.\n" +
+  "**4. No NSFW** No NSFW, gore, or inappropriate content.\n" +
+  "**5. No Self‑Promo** No advertising your socials, servers, or services.\n" +
+  "**6. Follow Staff** Follow instructions from admins and moderators.\n" +
+  "**7. Keep It Safe** No threats, no sharing private info, no unsafe behavior.\n" +
+  "**8. No Illegal Content** No hacks, scams, leaks, or illegal downloads.\n" +
+  "**9. No Doxing** Do not share anyone’s private information — addresses, numbers, names, school, workplace, IPs, anything.\n" +
+  "**10. Follow Discord Guidelines** We follow the official Discord Terms of Service and Community Guidelines."
       )
       .setFooter({ text: 'Underclips Server Rules' });
 
