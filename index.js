@@ -204,7 +204,7 @@ client.on('interactionCreate', async (interaction) => {
             allow: [
               PermissionsBitField.Flags.ViewChannel,
               PermissionsBitField.Flags.SendMessages,
-              PermissionsBitField.Flags.Man
+              PermissionsBitField.Flags
 
 
 
