@@ -104,31 +104,7 @@ client.once('ready', async () => {
         "**Minimum Views: Individual Posts**\n" +
         "A post must reach at least one 1000 views before those views count toward your total.\n\n" +
 
-        "**Payout Timelines**\n" +
-        "Payments are not sent immediately. The campaign must end first, then posts are reviewed, and the sponsor must approve the results.\n\n" +
-
-        "**Payment Method**\n" +
-        "You are paid only through the method chosen by the campaign, such as PayPal.\n\n" +
-
-        "**Payment Details**\n" +
-        "Your payout is sent to the payment information saved at the end of the campaign. If the payment is delivered but you cannot withdraw it, you must fix that issue yourself."
-      )
-      .setFooter({ text: 'Underclips Campaign Info' });
-
-    await campaignInfoChannel.send({ embeds: [payoutEmbed] });
-  }
-
-  // 📜 SHORTENED CAMPAIGN RULES EMBED (NEW)
-  const campaignRulesChannel = await client.channels.fetch(CAMPAIGN_RULES_CHANNEL_ID);
-  const campaignRulesMessages = await campaignRulesChannel.messages.fetch({ limit: 20 });
-  const campaignRulesExisting = campaignRulesMessages.find(
-    m => m.author.id === client.user.id && m.embeds.length > 0
-  );
-
-  if (!campaignRulesExisting) {
-    const campaignRulesEmbed = new EmbedBuilder()
-      .setColor('#
-
+        "**Payout Timelines
 
 
 
