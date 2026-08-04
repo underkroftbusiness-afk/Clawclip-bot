@@ -142,13 +142,12 @@ client.once('ready', async () => {
   if (!clipExisting) {
     const clipEmbed = new EmbedBuilder()
       .setColor('#2b2d31')
-      .setTitle('📘How to Clip and Earn')
+      .setTitle('📘Clipping-tips')
       .setDescription(
         "**The Hook**\nYour first 3 seconds decide if viewers stay. Strong openings increase watch time and push your video further. Create quick curiosity or emotion.\n\n" +
         "**Clip Selection & Length**\nChoose moments that feel viral or instantly grab attention. Short clips perform best. IG: ~40s • TikTok: ~30s • Shorts: 15–20s.\n\n" +
-        "**Editing**\nUse CapCut or OpusClip. Add clear, bold captions. Use trending audio to help the algorithm boost your content.\n\n" +
-        "**Account Warm‑Up**\nMake your account look active. Scroll, like, save, share. Upload private videos and switch filters.\n\n" +
-        "**Posting Strategy**\nPost every 3–4 hours. Use niche hashtags. Engage with creators to increase visibility."
+        "**Editing**\nYou can use CapCut or OpusClip to edit your clips. Add clear, bold captions to keep viewers focused, and choose trending audio to help the algorithm push your content further.\n\n" +
+        "**Posting Strategy**\nPost consistently throughout the day. Use hashtags that match your niche.
       )
       .setFooter({ text: 'Underclips Clipping Guide' });
 
