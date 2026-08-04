@@ -24,7 +24,7 @@ const SUPPORT_CHANNEL_ID = "1516092800469303437";
 const RULES_CHANNEL_ID = "1516812179410780261";
 const CAMPAIGN_INFO_CHANNEL_ID = "1515782662412046416";
 const CAMPAIGN_RULES_CHANNEL_ID = "1520485646311882945";
-const HOW_TO_CLIP_CHANNEL_ID = "1534171904137625631"; 
+const HOW_TO_CLIP_CHANNEL_ID = "1534171904137625631";
 
 // ✅ Bot online
 client.once('ready', async () => {
@@ -132,7 +132,7 @@ client.once('ready', async () => {
     await campaignRulesChannel.send({ embeds: [campaignRulesEmbed] });
   }
 
-  // 🎬 HOW TO CLIP — UPDATED $500/WEEK TEXT
+  // 🎬 HOW TO CLIP — UPDATED CLEAN TITLE + SHORT TEXT
   const clipChannel = await client.channels.fetch(HOW_TO_CLIP_CHANNEL_ID);
   const clipMessages = await clipChannel.messages.fetch({ limit: 20 });
   const clipExisting = clipMessages.find(
@@ -142,7 +142,7 @@ client.once('ready', async () => {
   if (!clipExisting) {
     const clipEmbed = new EmbedBuilder()
       .setColor('#2b2d31')
-      .setTitle('5 Rules to Hit $500/Week')
+      .setTitle('📘How to Clip and Earn')
       .setDescription(
         "**The Hook**\nYour first 3 seconds decide if viewers stay. Strong openings increase watch time and push your video further. Create quick curiosity or emotion.\n\n" +
         "**Clip Selection & Length**\nChoose moments that feel viral or instantly grab attention. Short clips perform best. IG: ~40s • TikTok: ~30s • Shorts: 15–20s.\n\n" +
@@ -211,6 +211,51 @@ client.on('interactionCreate', async (interaction) => {
         .setColor('#2b2d31')
         .setTitle('Ticket Created')
         .setDescription(`Welcome <@${interaction.user.id}>. Someone will help you shortly.\nIf your issue is solved, press the button below to close your ticket.`)
+        .setFooter({ text: 'Underclips Support' });
+
+      const closeRow = new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+          .setCustomId('close_ticket')
+          .setLabel('Close Ticket')
+          .setStyle(ButtonStyle.Danger)
+      );
+
+      await ticketChannel.send({ embeds: [ticketEmbed], components: [closeRow] });
+
+      await interaction.editReply({
+        content: `Your ticket has been created: ${ticketChannel}`,
+        ephemeral: true
+      });
+
+    } catch (err) {
+      console.error(err);
+      await interaction.editReply({
+        content: 'Something went wrong while creating your ticket.',
+        ephemeral: true
+      });
+    }
+  }
+
+  if (interaction.customId === 'close_ticket') {
+    const channel = interaction.channel;
+    const isOwner = channel.name.includes(interaction.user.username);
+
+    if (!isOwner) {
+      return interaction.reply({ content: "Only the ticket owner can close this.", ephemeral: true });
+    }
+
+    await interaction.reply({ content: "Ticket closed. Deleting in 3 seconds...", ephemeral: true });
+    setTimeout(() => channel.delete().catch(() => {}), 3000);
+  }
+});
+
+// 🏓 Ping command
+client.on('messageCreate', (message) => {
+  if (message.content === '!ping') message.reply('Pong!');
+});
+
+// 🔑 Login
+client.login(process.env.DISCORD_TOKEN);
 
 
 
