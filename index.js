@@ -147,7 +147,7 @@ client.once('ready', async () => {
         "**The Hook**\nYour first 3 seconds decide if viewers stay. Strong openings increase watch time and push your video further. Create quick curiosity or emotion.\n\n" +
         "**Clip Selection & Length**\nChoose moments that feel viral or instantly grab attention. Short clips perform best. IG: ~40s • TikTok: ~30s • Shorts: 15–20s.\n\n" +
         "**Editing**\nYou can use CapCut or OpusClip to edit your clips. Add clear, bold captions to keep viewers focused, and choose trending audio to help the algorithm push your content further.\n\n" +
-        "**Posting Strategy**\nPost consistently throughout the day. Use hashtags that match your niche, and engage with creators in your category to increase visibility."
+        "**Posting Strategy**\nPost consistently throughout the day. Use hashtags that match your niche."
       )
       .setFooter({ text: 'Underclips Clipping Guide' });
 
