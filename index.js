@@ -47,7 +47,7 @@ client.once('ready', async () => {
     const row = new ActionRowBuilder().addComponents(
       new ButtonBuilder()
         .setCustomId('create_ticket')
-        .setLabel('🎟️ Open Support Ticket')
+        .setLabel('Open Support Ticket')
         .setStyle(ButtonStyle.Primary)
     );
 
@@ -64,7 +64,7 @@ client.once('ready', async () => {
   if (!rulesExisting) {
     const rulesEmbed = new EmbedBuilder()
       .setColor('#2b2d31')
-      .setTitle('📜 Rules')
+      .setTitle('Rules')
       .setDescription(
         "**1. Respect Everyone** Be kind and mature.\n" +
         "**2. No Spam** Don’t flood chats.\n" +
@@ -92,7 +92,7 @@ client.once('ready', async () => {
   if (!campaignExisting) {
     const payoutEmbed = new EmbedBuilder()
       .setColor('#2b2d31')
-      .setTitle('💰 Payout Information')
+      .setTitle('Payout Information')
       .setDescription(
         "**Payrate System** Earn a fixed amount per views.\n\n" +
         "**Pot System** Earn based on your share of total views.\n\n" +
@@ -116,7 +116,7 @@ client.once('ready', async () => {
   if (!campaignRulesExisting) {
     const campaignRulesEmbed = new EmbedBuilder()
       .setColor('#2b2d31')
-      .setTitle('📋 Campaign Rules')
+      .setTitle('Campaign Rules')
       .setDescription(
         "**Real Engagement Only** No bots.\n\n" +
         "**Audience Must Match** English campaigns need 50%+ English audience.\n\n" +
@@ -132,7 +132,7 @@ client.once('ready', async () => {
     await campaignRulesChannel.send({ embeds: [campaignRulesEmbed] });
   }
 
-  // 🎬 HOW TO CLIP — YOUR $500/WEEK TEXT
+  // 🎬 HOW TO CLIP — UPDATED $500/WEEK TEXT
   const clipChannel = await client.channels.fetch(HOW_TO_CLIP_CHANNEL_ID);
   const clipMessages = await clipChannel.messages.fetch({ limit: 20 });
   const clipExisting = clipMessages.find(
@@ -142,14 +142,13 @@ client.once('ready', async () => {
   if (!clipExisting) {
     const clipEmbed = new EmbedBuilder()
       .setColor('#2b2d31')
-      .setTitle('📘 How to Clip & Earn $500/Week')
+      .setTitle('5 Rules to Hit $500/Week')
       .setDescription(
-        "**🔥 The Hook**\nYour first 3 seconds decide everything. Strong emotional or curiosity hooks keep viewers watching.\n\n" +
-        "**🎯 Clip Selection & Length**\nPick clips with viral potential.\nIG: 40s • TikTok: 30s • Shorts: 15–20s.\n\n" +
-        "**🎨 Editing**\nUse CapCut or OpusClip. Add colored captions and trending audio.\n\n" +
-        "**📈 Account Warm‑Up**\nScroll, like, save, share. Upload private videos. Use different filters.\n\n" +
-        "**📤 Posting Strategy**\nPost every 3–4 hours. Use niche hashtags. Engage with creators.\n\n" +
-        "**💵 Goal: $500/week**\nFollow these rules consistently and your clips will perform better, grow faster, and earn more."
+        "**The Hook**\nYour first 3 seconds decide if viewers stay. Strong openings increase watch time and push your video further. Create quick curiosity or emotion.\n\n" +
+        "**Clip Selection & Length**\nChoose moments that feel viral or instantly grab attention. Short clips perform best. IG: ~40s • TikTok: ~30s • Shorts: 15–20s.\n\n" +
+        "**Editing**\nUse CapCut or OpusClip. Add clear, bold captions. Use trending audio to help the algorithm boost your content.\n\n" +
+        "**Account Warm‑Up**\nMake your account look active. Scroll, like, save, share. Upload private videos and switch filters.\n\n" +
+        "**Posting Strategy**\nPost every 3–4 hours. Use niche hashtags. Engage with creators to increase visibility."
       )
       .setFooter({ text: 'Underclips Clipping Guide' });
 
@@ -161,7 +160,7 @@ client.once('ready', async () => {
 client.on('guildMemberAdd', async (member) => {
   try {
     await member.send(
-      `👋 Welcome to Underclips — The Clipping Server That Helps You!\n\nUnderclips is a place made for people who clip. You join, you get support, you grow, and you find chances to earn more from your content. It’s a server built to make clipping easier and help you improve.`
+      `Welcome to Underclips.\n\nUnderclips is built for clippers who want to grow, improve, and earn from their content.`
     );
   } catch {
     console.log('Could not send DM.');
@@ -210,53 +209,8 @@ client.on('interactionCreate', async (interaction) => {
 
       const ticketEmbed = new EmbedBuilder()
         .setColor('#2b2d31')
-        .setTitle('🎫 Ticket Created')
-        .setDescription(`Welcome <@${interaction.user.id}>! Someone will help you shortly.\nIf your issue is solved, press the button below to close your ticket.`)
-        .setFooter({ text: 'Underclips Support' });
-
-      const closeRow = new ActionRowBuilder().addComponents(
-        new ButtonBuilder()
-          .setCustomId('close_ticket')
-          .setLabel('🔒 Close Ticket')
-          .setStyle(ButtonStyle.Danger)
-      );
-
-      await ticketChannel.send({ embeds: [ticketEmbed], components: [closeRow] });
-
-      await interaction.editReply({
-        content: `✅ Your ticket has been created: ${ticketChannel}`,
-        ephemeral: true
-      });
-
-    } catch (err) {
-      console.error(err);
-      await interaction.editReply({
-        content: '⚠️ Something went wrong while creating your ticket.\nMake sure the bot has **Manage Channels** permission.',
-        ephemeral: true
-      });
-    }
-  }
-
-  if (interaction.customId === 'close_ticket') {
-    const channel = interaction.channel;
-    const isOwner = channel.name.includes(interaction.user.username);
-
-    if (!isOwner) {
-      return interaction.reply({ content: "Only the ticket owner can close this.", ephemeral: true });
-    }
-
-    await interaction.reply({ content: "Ticket closed. Deleting in 3 seconds...", ephemeral: true });
-    setTimeout(() => channel.delete().catch(() => {}), 3000);
-  }
-});
-
-// 🏓 Ping command
-client.on('messageCreate', (message) => {
-  if (message.content === '!ping') message.reply('Pong!');
-});
-
-// 🔑 Login
-client.login(process.env.DISCORD_TOKEN);
+        .setTitle('Ticket Created')
+        .setDescription(`Welcome <@${interaction.user.id}>. Someone will help you shortly.\nIf your issue is solved, press the button below to close your ticket.`)
 
 
 
