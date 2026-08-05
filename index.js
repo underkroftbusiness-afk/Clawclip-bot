@@ -1,5 +1,5 @@
 // part1.js
-require('dotenv').config(); // load .env early
+require('dotenv').config();
 
 const {
   Client,
@@ -35,7 +35,6 @@ const APPLICATION_CHANNEL_ID = "1534208165443404020";
 client.once('ready', async () => {
   console.log(`Bot online as ${client.user.tag}`);
 
-  // RULES EMBED (sends once)
   try {
     const rulesChannel = await client.channels.fetch(RULES_CHANNEL_ID);
     if (!rulesChannel || !rulesChannel.isTextBased()) {
@@ -43,7 +42,6 @@ client.once('ready', async () => {
     } else {
       const rulesMessages = await rulesChannel.messages.fetch({ limit: 20 });
       const rulesExisting = rulesMessages.find(m => m.author?.id === client.user.id && m.embeds.length > 0);
-
       if (!rulesExisting) {
         const rulesEmbed = new EmbedBuilder()
           .setColor('#2b2d31')
@@ -69,7 +67,6 @@ client.once('ready', async () => {
     console.error('Failed to send rules embed:', err);
   }
 
-  // WORK WITH US EMBED (sends once)
   try {
     const workChannel = await client.channels.fetch(WORK_WITH_US_CHANNEL_ID);
     if (!workChannel || !workChannel.isTextBased()) {
@@ -77,7 +74,6 @@ client.once('ready', async () => {
     } else {
       const workMessages = await workChannel.messages.fetch({ limit: 20 });
       const workExisting = workMessages.find(m => m.author?.id === client.user.id && m.embeds.length > 0);
-
       if (!workExisting) {
         const workEmbed = new EmbedBuilder()
           .setColor('#2b2d31')
@@ -105,41 +101,14 @@ client.once('ready', async () => {
 client.on('interactionCreate', async (interaction) => {
   try {
     if (interaction.isButton()) {
-      // SERVICE modal (show immediately) - max 5 inputs per modal
       if (interaction.customId === 'apply_service') {
-        const modal = new ModalBuilder()
-          .setCustomId('service_form')
-          .setTitle('📝 Service Submission');
+        const modal = new ModalBuilder().setCustomId('service_form').setTitle('📝 Service Submission');
 
-        const contactInput = new TextInputBuilder()
-          .setCustomId('contact')
-          .setLabel('Contact')
-          .setStyle(TextInputStyle.Short)
-          .setRequired(true);
-
-        const serviceInput = new TextInputBuilder()
-          .setCustomId('service_details')
-          .setLabel('Service')
-          .setStyle(TextInputStyle.Paragraph)
-          .setRequired(true);
-
-        const pricingInput = new TextInputBuilder()
-          .setCustomId('pricing')
-          .setLabel('Pricing (Upfront / After / Fixed Amount)')
-          .setStyle(TextInputStyle.Short)
-          .setRequired(false);
-
-        const portfolioInput = new TextInputBuilder()
-          .setCustomId('portfolio')
-          .setLabel('Portfolio')
-          .setStyle(TextInputStyle.Paragraph)
-          .setRequired(false);
-
-        const extraInput = new TextInputBuilder()
-          .setCustomId('extra_info')
-          .setLabel('Extra Info')
-          .setStyle(TextInputStyle.Paragraph)
-          .setRequired(false);
+        const contactInput = new TextInputBuilder().setCustomId('contact').setLabel('Contact').setStyle(TextInputStyle.Short).setRequired(true);
+        const serviceInput = new TextInputBuilder().setCustomId('service_details').setLabel('Service').setStyle(TextInputStyle.Paragraph).setRequired(true);
+        const pricingInput = new TextInputBuilder().setCustomId('pricing').setLabel('Pricing (Upfront / After / Fixed Amount)').setStyle(TextInputStyle.Short).setRequired(false);
+        const portfolioInput = new TextInputBuilder().setCustomId('portfolio').setLabel('Portfolio').setStyle(TextInputStyle.Paragraph).setRequired(false);
+        const extraInput = new TextInputBuilder().setCustomId('extra_info').setLabel('Extra Info').setStyle(TextInputStyle.Paragraph).setRequired(false);
 
         modal.addComponents(
           new ActionRowBuilder().addComponents(contactInput),
@@ -153,41 +122,14 @@ client.on('interactionCreate', async (interaction) => {
         return;
       }
 
-      // MODERATOR modal (show immediately) - max 5 inputs per modal
       if (interaction.customId === 'apply_moderator') {
-        const modal = new ModalBuilder()
-          .setCustomId('moderator_form')
-          .setTitle('🛡️ Moderator Application');
+        const modal = new ModalBuilder().setCustomId('moderator_form').setTitle('🛡️ Moderator Application');
 
-        const basicInput = new TextInputBuilder()
-          .setCustomId('basic_info')
-          .setLabel('Basic Info')
-          .setStyle(TextInputStyle.Short)
-          .setRequired(true);
-
-        const timezoneInput = new TextInputBuilder()
-          .setCustomId('timezone')
-          .setLabel('Timezone')
-          .setStyle(TextInputStyle.Short)
-          .setRequired(true);
-
-        const activityInput = new TextInputBuilder()
-          .setCustomId('activity')
-          .setLabel('Activity (hours per day/week)')
-          .setStyle(TextInputStyle.Short)
-          .setRequired(true);
-
-        const reasonInput = new TextInputBuilder()
-          .setCustomId('reason')
-          .setLabel('Why do you want to be a moderator?')
-          .setStyle(TextInputStyle.Paragraph)
-          .setRequired(true);
-
-        const experienceInput = new TextInputBuilder()
-          .setCustomId('experience')
-          .setLabel('Experience (optional)')
-          .setStyle(TextInputStyle.Paragraph)
-          .setRequired(false);
+        const basicInput = new TextInputBuilder().setCustomId('basic_info').setLabel('Basic Info').setStyle(TextInputStyle.Short).setRequired(true);
+        const timezoneInput = new TextInputBuilder().setCustomId('timezone').setLabel('Timezone').setStyle(TextInputStyle.Short).setRequired(true);
+        const activityInput = new TextInputBuilder().setCustomId('activity').setLabel('Activity (hours per day/week)').setStyle(TextInputStyle.Short).setRequired(true);
+        const reasonInput = new TextInputBuilder().setCustomId('reason').setLabel('Why do you want to be a moderator?').setStyle(TextInputStyle.Paragraph).setRequired(true);
+        const experienceInput = new TextInputBuilder().setCustomId('experience').setLabel('Experience (optional)').setStyle(TextInputStyle.Paragraph).setRequired(false);
 
         modal.addComponents(
           new ActionRowBuilder().addComponents(basicInput),
@@ -201,7 +143,6 @@ client.on('interactionCreate', async (interaction) => {
         return;
       }
 
-      // ACCEPT application button
       if (interaction.customId.startsWith('accept_application_')) {
         const userId = interaction.customId.replace('accept_application_', '');
         const guild = interaction.guild;
@@ -214,18 +155,8 @@ client.on('interactionCreate', async (interaction) => {
           name: `application-${userId}`,
           type: ChannelType.GuildText,
           permissionOverwrites: [
-            {
-              id: guild.roles.everyone.id || guild.id,
-              deny: [PermissionsBitField.Flags.ViewChannel]
-            },
-            {
-              id: userId,
-              allow: [
-                PermissionsBitField.Flags.ViewChannel,
-                PermissionsBitField.Flags.SendMessages,
-                PermissionsBitField.Flags.ReadMessageHistory
-              ]
-            }
+            { id: guild.roles.everyone.id || guild.id, deny: [PermissionsBitField.Flags.ViewChannel] },
+            { id: userId, allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages, PermissionsBitField.Flags.ReadMessageHistory] }
           ]
         });
 
@@ -240,7 +171,6 @@ client.on('interactionCreate', async (interaction) => {
         return;
       }
 
-      // DENY application button
       if (interaction.customId.startsWith('deny_application_')) {
         await interaction.reply({
           content:
@@ -252,7 +182,6 @@ client.on('interactionCreate', async (interaction) => {
         return;
       }
 
-      // STAFF CLOSE ticket button (if used)
       if (interaction.customId.startsWith('staff_close_')) {
         const channelId = interaction.customId.replace('staff_close_', '');
         const channel = interaction.guild?.channels.cache.get(channelId);
@@ -264,11 +193,9 @@ client.on('interactionCreate', async (interaction) => {
         setTimeout(() => channel.delete().catch(() => {}), 3000);
         return;
       }
-    } // end isButton
+    }
 
-    // MODAL SUBMISSIONS
     if (interaction.isModalSubmit()) {
-      // SERVICE SUBMISSION
       if (interaction.customId === 'service_form') {
         const contact = interaction.fields.getTextInputValue('contact');
         const service = interaction.fields.getTextInputValue('service_details');
@@ -305,7 +232,6 @@ client.on('interactionCreate', async (interaction) => {
         return;
       }
 
-      // MODERATOR SUBMISSION
       if (interaction.customId === 'moderator_form') {
         const basic = interaction.fields.getTextInputValue('basic_info');
         const timezone = interaction.fields.getTextInputValue('timezone');
@@ -341,7 +267,7 @@ client.on('interactionCreate', async (interaction) => {
         await interaction.reply({ content: "✅ Your application has been submitted.", ephemeral: true });
         return;
       }
-    } // end isModalSubmit
+    }
   } catch (err) {
     console.error('Interaction handler error:', err);
     try {
@@ -354,13 +280,13 @@ client.on('interactionCreate', async (interaction) => {
   }
 });
 // part3.js
-// Ensure dotenv is loaded (done in part1). Use a single token variable and clearer errors.
+// Token validation and login
 
 const BOT_TOKEN = process.env.TOKEN || process.env.BOT_TOKEN || null;
 
 if (!BOT_TOKEN || typeof BOT_TOKEN !== 'string' || BOT_TOKEN.trim().length === 0) {
   console.error('Missing or invalid bot token. Set TOKEN in your environment or .env file.');
-  console.error('Example .env content:');
+  console.error('Create a .env file with:');
   console.error('TOKEN=your_bot_token_here');
   process.exit(1);
 }
@@ -371,6 +297,5 @@ client.login(BOT_TOKEN)
     console.error('Failed to login. Check token and gateway intents. Error:', err);
     process.exit(1);
   });
-
 
 
