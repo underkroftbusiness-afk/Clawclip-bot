@@ -1,4 +1,6 @@
 // part1.js
+require('dotenv').config(); // load .env early
+
 const {
   Client,
   GatewayIntentBits,
@@ -352,14 +354,23 @@ client.on('interactionCreate', async (interaction) => {
   }
 });
 // part3.js
-// Start the bot
-if (!process.env.TOKEN) {
-  console.error('Missing TOKEN in environment variables.');
+// Ensure dotenv is loaded (done in part1). Use a single token variable and clearer errors.
+
+const BOT_TOKEN = process.env.TOKEN || process.env.BOT_TOKEN || null;
+
+if (!BOT_TOKEN || typeof BOT_TOKEN !== 'string' || BOT_TOKEN.trim().length === 0) {
+  console.error('Missing or invalid bot token. Set TOKEN in your environment or .env file.');
+  console.error('Example .env content:');
+  console.error('TOKEN=your_bot_token_here');
   process.exit(1);
 }
 
-client.login(process.env.TOKEN).catch(err => {
-  console.error('Failed to login:', err);
-});
+client.login(BOT_TOKEN)
+  .then(() => console.log('Login successful'))
+  .catch(err => {
+    console.error('Failed to login. Check token and gateway intents. Error:', err);
+    process.exit(1);
+  });
+
 
 
