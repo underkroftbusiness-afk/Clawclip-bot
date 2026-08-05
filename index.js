@@ -25,19 +25,17 @@ const RULES_CHANNEL_ID = "1516812179410780261";
 const CAMPAIGN_INFO_CHANNEL_ID = "1515782662412046416";
 const CAMPAIGN_RULES_CHANNEL_ID = "1520485646311882945";
 const HOW_TO_CLIP_CHANNEL_ID = "1534171904137625631";
-
 const WORK_WITH_US_CHANNEL_ID = "1532762065758978190";
 const APPLICATION_CHANNEL_ID = "1534208165443404020";
 
 // BOT READY
 client.once('ready', async () => {
   console.log(`Bot online as ${client.user.tag}`);
+
   // 📜 RULES MESSAGE
   const rulesChannel = await client.channels.fetch(RULES_CHANNEL_ID);
   const rulesMessages = await rulesChannel.messages.fetch({ limit: 20 });
-  const rulesExisting = rulesMessages.find(
-    m => m.author.id === client.user.id && m.embeds.length > 0
-  );
+  const rulesExisting = rulesMessages.find(m => m.author.id === client.user.id && m.embeds.length > 0);
 
   if (!rulesExisting) {
     const rulesEmbed = new EmbedBuilder()
@@ -63,9 +61,7 @@ client.once('ready', async () => {
   // 💰 CAMPAIGN INFO
   const campaignInfoChannel = await client.channels.fetch(CAMPAIGN_INFO_CHANNEL_ID);
   const campaignMessages = await campaignInfoChannel.messages.fetch({ limit: 20 });
-  const campaignExisting = campaignMessages.find(
-    m => m.author.id === client.user.id && m.embeds.length > 0
-  );
+  const campaignExisting = campaignMessages.find(m => m.author.id === client.user.id && m.embeds.length > 0);
 
   if (!campaignExisting) {
     const payoutEmbed = new EmbedBuilder()
@@ -87,9 +83,7 @@ client.once('ready', async () => {
   // 📋 CAMPAIGN RULES
   const campaignRulesChannel = await client.channels.fetch(CAMPAIGN_RULES_CHANNEL_ID);
   const campaignRulesMessages = await campaignRulesChannel.messages.fetch({ limit: 20 });
-  const campaignRulesExisting = campaignRulesMessages.find(
-    m => m.author.id === client.user.id && m.embeds.length > 0
-  );
+  const campaignRulesExisting = campaignRulesMessages.find(m => m.author.id === client.user.id && m.embeds.length > 0);
 
   if (!campaignRulesExisting) {
     const campaignRulesEmbed = new EmbedBuilder()
@@ -113,9 +107,7 @@ client.once('ready', async () => {
   // 📘 CLIPPING TIPS
   const clipChannel = await client.channels.fetch(HOW_TO_CLIP_CHANNEL_ID);
   const clipMessages = await clipChannel.messages.fetch({ limit: 20 });
-  const clipExisting = clipMessages.find(
-    m => m.author.id === client.user.id && m.embeds.length > 0
-  );
+  const clipExisting = clipMessages.find(m => m.author.id === client.user.id && m.embeds.length > 0);
 
   if (!clipExisting) {
     const clipEmbed = new EmbedBuilder()
@@ -135,9 +127,7 @@ client.once('ready', async () => {
   // 📋 UNDERCLIPS — SUBMIT A REQUEST
   const workChannel = await client.channels.fetch(WORK_WITH_US_CHANNEL_ID);
   const workMessages = await workChannel.messages.fetch({ limit: 20 });
-  const workExisting = workMessages.find(
-    m => m.author.id === client.user.id && m.embeds.length > 0
-  );
+  const workExisting = workMessages.find(m => m.author.id === client.user.id && m.embeds.length > 0);
 
   if (!workExisting) {
     const workEmbed = new EmbedBuilder()
@@ -164,6 +154,7 @@ client.once('ready', async () => {
     await workChannel.send({ embeds: [workEmbed], components: [workRow] });
   }
 });
+
 // 👋 AUTO DM ON JOIN
 client.on('guildMemberAdd', async (member) => {
   try {
@@ -260,6 +251,7 @@ client.on('interactionCreate', async (interaction) => {
 
       setTimeout(() => channel.delete().catch(() => {}), 3000);
     }
+
     // 📝 SERVICE SUBMISSION FORM
     if (interaction.customId === 'apply_service') {
       await interaction.showModal({
@@ -435,6 +427,7 @@ client.on('interactionCreate', async (interaction) => {
         ]
       });
     }
+
     // 🟩 ACCEPT APPLICATION
     if (interaction.customId.startsWith('accept_application_')) {
       const userId = interaction.customId.replace('accept_application_', '');
@@ -525,6 +518,7 @@ client.on('interactionCreate', async (interaction) => {
       setTimeout(() => channel.delete().catch(() => {}), 3000);
     }
   }
+
   // 📝 MODAL SUBMISSION HANDLING
   if (interaction.isModalSubmit()) {
 
@@ -549,77 +543,7 @@ client.on('interactionCreate', async (interaction) => {
           `**Pricing:** ${pricing || "None"}\n\n` +
           `**Portfolio:** ${portfolio || "None"}\n\n` +
           `**Extra Info:** ${extra_info || "None"}\n\n` +
-          `**Questions:** ${questions || "None"}`
-        )
-        .setFooter({ text: 'Underclips — Service Submission' });
-
-      const row = new ActionRowBuilder().addComponents(
-        new ButtonBuilder()
-          .setCustomId(`accept_application_${interaction.user.id}`)
-          .setLabel('Accept')
-          .setStyle(ButtonStyle.Success),
-        new ButtonBuilder()
-          .setCustomId(`deny_application_${interaction.user.id}`)
-          .setLabel('Deny')
-          .setStyle(ButtonStyle.Danger)
-      );
-
-      await appChannel.send({ embeds: [embed], components: [row] });
-
-      await interaction.reply({
-        content: "Your submission has been sent.",
-        ephemeral: true
-      });
-    }
-
-    // MODERATOR FORM SUBMISSION
-    if (interaction.customId === 'moderator_form') {
-      const basic_info = interaction.fields.getTextInputValue('basic_info');
-      const timezone = interaction.fields.getTextInputValue('timezone');
-      const activity = interaction.fields.getTextInputValue('activity');
-      const reason = interaction.fields.getTextInputValue('reason');
-      const experience = interaction.fields.getTextInputValue('experience');
-      const questions = interaction.fields.getTextInputValue('questions');
-
-      const appChannel = await interaction.guild.channels.fetch(APPLICATION_CHANNEL_ID);
-
-      const embed = new EmbedBuilder()
-        .setColor('#2b2d31')
-        .setTitle('🛡️ New Moderator Application')
-        .setDescription(
-          `**User:** <@${interaction.user.id}>\n\n` +
-          `**Basic Info:** ${basic_info}\n\n` +
-          `**Timezone:** ${timezone}\n\n` +
-          `**Activity:** ${activity}\n\n` +
-          `**Reason:** ${reason}\n\n` +
-          `**Experience:** ${experience || "None"}\n\n` +
-          `**Questions:** ${questions || "None"}`
-        )
-        .setFooter({ text: 'Underclips — Moderator Application' });
-
-      const row = new ActionRowBuilder().addComponents(
-        new ButtonBuilder()
-          .setCustomId(`accept_application_${interaction.user.id}`)
-          .setLabel('Accept')
-          .setStyle(ButtonStyle.Success),
-        new ButtonBuilder()
-          .setCustomId(`deny_application_${interaction.user.id}`)
-          .setLabel('Deny')
-          .setStyle(ButtonStyle.Danger)
-      );
-
-      await appChannel.send({ embeds: [embed], components: [row] });
-
-      await interaction.reply({
-        content: "Your application has been submitted.",
-        ephemeral: true
-      });
-    }
-  }
-});
-});
-// 🔑 BOT LOGIN
-client.login(process.env.TOKEN);
+          `**Questions:** ${questions || "None"}
 
 
 
