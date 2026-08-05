@@ -85,7 +85,6 @@ client.once('ready', async () => {
 
     await rulesChannel.send({ embeds: [rulesEmbed] });
   }
-
   // 💰 CAMPAIGN INFO
   const campaignInfoChannel = await client.channels.fetch(CAMPAIGN_INFO_CHANNEL_ID);
   const campaignMessages = await campaignInfoChannel.messages.fetch({ limit: 20 });
@@ -136,7 +135,7 @@ client.once('ready', async () => {
     await campaignRulesChannel.send({ embeds: [campaignRulesEmbed] });
   }
 
-  // 📘 ORIGINAL CLIPPING-TIPS — RESTORED EXACTLY
+  // 📘 CLIPPING TIPS
   const clipChannel = await client.channels.fetch(HOW_TO_CLIP_CHANNEL_ID);
   const clipMessages = await clipChannel.messages.fetch({ limit: 20 });
   const clipExisting = clipMessages.find(
@@ -148,17 +147,17 @@ client.once('ready', async () => {
       .setColor('#2b2d31')
       .setTitle('📘Clipping-tips')
       .setDescription(
-        "**The Hook**\nYour first 3 seconds decide if viewers stay. Strong openings increase watch time and push your video further. Create quick curiosity or emotion.\n\n" +
-        "**Clip Selection & Length**\nChoose moments that feel viral or instantly grab attention. Short clips perform best. IG: ~40s • TikTok: ~30s • Shorts: 15–20s.\n\n" +
-        "**Editing**\nYou can use CapCut or OpusClip to edit your clips. Add clear, bold captions to keep viewers focused, and choose trending audio to help the algorithm push your content further.\n\n" +
-        "**Posting Strategy**\nPost consistently throughout the day. Use hashtags that match your niche."
+        "**The Hook**\nYour first 3 seconds decide if viewers stay.\n\n" +
+        "**Clip Selection & Length**\nShort clips perform best.\n\n" +
+        "**Editing**\nUse CapCut or OpusClip.\n\n" +
+        "**Posting Strategy**\nPost consistently."
       )
       .setFooter({ text: 'Underclips Clipping Guide' });
 
     await clipChannel.send({ embeds: [clipEmbed] });
   }
 
-  // 📋 SUBMIT A REQUEST — APPLICATION SYSTEM
+  // 📋 SUBMIT A REQUEST — UPDATED TITLE
   const workChannel = await client.channels.fetch(WORK_WITH_US_CHANNEL_ID);
   const workMessages = await workChannel.messages.fetch({ limit: 20 });
   const workExisting = workMessages.find(
@@ -168,12 +167,12 @@ client.once('ready', async () => {
   if (!workExisting) {
     const workEmbed = new EmbedBuilder()
       .setColor('#2b2d31')
-      .setTitle('📋 Submit a Request')
+      .setTitle('📋 Underclips — Submit a Request')
       .setDescription(
         "📝 **Service Submission**\n" +
-        "Interested in offering your services or creating your own campaign? Submit your details and we will review your request.\n\n" +
+        "Offer your services or create a campaign.\n\n" +
         "🛡️ **Moderator**\n" +
-        "Apply to be a moderator and support the community. Submit your details to begin.\n\n" +
+        "Apply to be a moderator.\n\n" +
         "———————————————\nClick a button below to begin."
       )
       .setFooter({ text: 'Underclips — Applications' });
@@ -192,7 +191,6 @@ client.once('ready', async () => {
     await workChannel.send({ embeds: [workEmbed], components: [workRow] });
   }
 });
-
 // 👋 Auto DM
 client.on('guildMemberAdd', async (member) => {
   try {
@@ -204,10 +202,12 @@ client.on('guildMemberAdd', async (member) => {
   }
 });
 
-// INTERACTIONS: tickets, forms, accept/deny, close
+// INTERACTIONS
 client.on('interactionCreate', async (interaction) => {
+
   // BUTTONS
   if (interaction.isButton()) {
+
     // 🎟️ Support ticket
     if (interaction.customId === 'create_ticket') {
       try {
@@ -274,7 +274,7 @@ client.on('interactionCreate', async (interaction) => {
       }
     }
 
-    // Close support ticket (user-owned)
+    // Close support ticket
     if (interaction.customId === 'close_ticket') {
       const channel = interaction.channel;
       const isOwner = channel.name.includes(interaction.user.username);
@@ -287,7 +287,7 @@ client.on('interactionCreate', async (interaction) => {
       setTimeout(() => channel.delete().catch(() => {}), 3000);
     }
 
-    // 📝 SERVICE SUBMISSION FORM OPEN
+    // 📝 SERVICE SUBMISSION FORM — UPDATED
     if (interaction.customId === 'apply_service') {
       await interaction.showModal({
         custom_id: 'service_form',
@@ -299,9 +299,9 @@ client.on('interactionCreate', async (interaction) => {
               {
                 type: 4,
                 custom_id: 'contact',
-                label: 'Contact Information',
+                label: 'Contact (Telegram / Email / Discord)',
                 style: 1,
-                placeholder: 'Discord tag, email, etc.',
+                placeholder: 'Share the platforms you use so we can contact you.',
                 required: true
               }
             ]
@@ -312,9 +312,9 @@ client.on('interactionCreate', async (interaction) => {
               {
                 type: 4,
                 custom_id: 'service_details',
-                label: 'Service Details',
+                label: 'What service are you offering?',
                 style: 2,
-                placeholder: 'Describe your service or campaign idea',
+                placeholder: 'Describe the service you want to provide.',
                 required: true
               }
             ]
@@ -325,9 +325,48 @@ client.on('interactionCreate', async (interaction) => {
               {
                 type: 4,
                 custom_id: 'pricing',
-                label: 'Pricing / Rates',
+                label: 'Pricing / Payment Terms',
                 style: 1,
-                placeholder: 'Your pricing or payment terms',
+                placeholder: 'Explain how you prefer payments to be handled.',
+                required: false
+              }
+            ]
+          },
+          {
+            type: 1,
+            components: [
+              {
+                type: 4,
+                custom_id: 'portfolio',
+                label: 'Past Work (Optional)',
+                style: 2,
+                placeholder: 'Send screenshots or explain your experience.',
+                required: false
+              }
+            ]
+          },
+          {
+            type: 1,
+            components: [
+              {
+                type: 4,
+                custom_id: 'extra_info',
+                label: 'Anything we should know?',
+                style: 2,
+                placeholder: 'Add any extra details important for your service.',
+                required: false
+              }
+            ]
+          },
+          {
+            type: 1,
+            components: [
+              {
+                type: 4,
+                custom_id: 'questions',
+                label: 'Do you have any questions for us?',
+                style: 2,
+                placeholder: 'If anything is unclear, ask here.',
                 required: false
               }
             ]
@@ -336,7 +375,7 @@ client.on('interactionCreate', async (interaction) => {
       });
     }
 
-    // 🛡️ MODERATOR FORM OPEN
+    // 🛡️ MODERATOR FORM — UPDATED
     if (interaction.customId === 'apply_moderator') {
       await interaction.showModal({
         custom_id: 'moderator_form',
@@ -347,10 +386,36 @@ client.on('interactionCreate', async (interaction) => {
             components: [
               {
                 type: 4,
-                custom_id: 'age',
-                label: 'Your Age',
+                custom_id: 'basic_info',
+                label: 'Basic Info (Discord @ / Age)',
                 style: 1,
-                placeholder: 'Enter your age',
+                placeholder: 'Share your Discord @ and your age.',
+                required: true
+              }
+            ]
+          },
+          {
+            type: 1,
+            components: [
+              {
+                type: 4,
+                custom_id: 'timezone',
+                label: 'Timezone',
+                style: 1,
+                placeholder: 'Tell us your timezone.',
+                required: true
+              }
+            ]
+          },
+          {
+            type: 1,
+            components: [
+              {
+                type: 4,
+                custom_id: 'activity',
+                label: 'Activity',
+                style: 1,
+                placeholder: 'Explain how active you can be.',
                 required: true
               }
             ]
@@ -363,7 +428,7 @@ client.on('interactionCreate', async (interaction) => {
                 custom_id: 'reason',
                 label: 'Why do you want to be a moderator?',
                 style: 2,
-                placeholder: 'Explain why you want the role',
+                placeholder: 'Explain why you want to join the moderator team.',
                 required: true
               }
             ]
@@ -374,9 +439,9 @@ client.on('interactionCreate', async (interaction) => {
               {
                 type: 4,
                 custom_id: 'experience',
-                label: 'Moderation Experience',
+                label: 'Moderator Experience',
                 style: 2,
-                placeholder: 'Describe any past moderation experience (optional)',
+                placeholder: 'Describe any moderation experience you have.',
                 required: false
               }
             ]
@@ -386,23 +451,10 @@ client.on('interactionCreate', async (interaction) => {
             components: [
               {
                 type: 4,
-                custom_id: 'activity',
-                label: 'How active can you be?',
-                style: 1,
-                placeholder: 'Daily hours or schedule',
-                required: true
-              }
-            ]
-          },
-          {
-            type: 1,
-            components: [
-              {
-                type: 4,
-                custom_id: 'extra',
-                label: 'Anything else?',
+                custom_id: 'questions',
+                label: 'Do you have any questions for us?',
                 style: 2,
-                placeholder: 'Optional additional info',
+                placeholder: 'If anything is unclear, ask here.',
                 required: false
               }
             ]
@@ -411,7 +463,7 @@ client.on('interactionCreate', async (interaction) => {
       });
     }
 
-    // 🟩 ACCEPT APPLICATION → auto ticket
+    // 🟩 ACCEPT APPLICATION — UPDATED MESSAGE
     if (interaction.customId.startsWith('accept_application_')) {
       const userId = interaction.customId.replace('accept_application_', '');
 
@@ -456,18 +508,19 @@ client.on('interactionCreate', async (interaction) => {
 
       await ticketChannel.send({
         content:
-          `🎉 **Your submission has been accepted.**\n` +
-          `We’ve opened this ticket so we can discuss the details with you and complete the process. We will assist you shortly.`,
+          `**Your submission has been accepted.**\n` +
+          `A ticket will now be opened so we can discuss the details with you.\n` +
+          `We will assist you shortly.`,
         components: [closeRow]
       });
 
       await interaction.reply({
-        content: `🟩 **Accepted** — Ticket created: ${ticketChannel}`,
+        content: `Accepted — Ticket created: ${ticketChannel}`,
         ephemeral: false
       });
     }
 
-    // 🟥 DENY APPLICATION
+    // 🟥 DENY APPLICATION — ALREADY CORRECT
     if (interaction.customId.startsWith('deny_application_')) {
       const userId = interaction.customId.replace('deny_application_', '');
 
@@ -481,112 +534,7 @@ client.on('interactionCreate', async (interaction) => {
     }
 
     // 🔒 STAFF CLOSE APPLICATION TICKET
-    if (interaction.customId.startsWith('staff_close_')) {
-      const channelId = interaction.customId.replace('staff_close_', '');
-
-      if (!interaction.member.permissions.has(PermissionsBitField.Flags.ManageChannels)) {
-        return interaction.reply({
-          content: "Only staff can close this ticket.",
-          ephemeral: true
-        });
-      }
-
-      const channel = interaction.guild.channels.cache.get(channelId);
-
-      await interaction.reply({
-        content: "🔒 Ticket closed. Deleting in 3 seconds...",
-        ephemeral: false
-      });
-
-      setTimeout(() => {
-        channel.delete().catch(() => {});
-      }, 3000);
-    }
-  }
-
-  // MODAL SUBMISSIONS
-  if (interaction.isModalSubmit()) {
-    // 📝 SERVICE SUBMISSION
-    if (interaction.customId === 'service_form') {
-      const contact = interaction.fields.getTextInputValue('contact');
-      const details = interaction.fields.getTextInputValue('service_details');
-      const pricing = interaction.fields.getTextInputValue('pricing');
-
-      const appChannel = await client.channels.fetch(APPLICATION_CHANNEL_ID);
-
-      const embed = new EmbedBuilder()
-        .setColor('#2b2d31')
-        .setTitle('📝 New Service Submission')
-        .addFields(
-          { name: 'Contact', value: contact },
-          { name: 'Details', value: details },
-          { name: 'Pricing', value: pricing || 'Not provided' }
-        )
-        .setFooter({ text: 'Underclips Applications' });
-
-      const actionRow = new ActionRowBuilder().addComponents(
-        new ButtonBuilder()
-          .setCustomId(`accept_application_${interaction.user.id}`)
-          .setLabel('🟩 Accept')
-          .setStyle(ButtonStyle.Success),
-        new ButtonBuilder()
-          .setCustomId(`deny_application_${interaction.user.id}`)
-          .setLabel('🟥 Deny')
-          .setStyle(ButtonStyle.Danger)
-      );
-
-      await appChannel.send({ embeds: [embed], components: [actionRow] });
-      await interaction.reply({ content: 'Your submission has been sent.', ephemeral: true });
-    }
-
-    // 🛡️ MODERATOR SUBMISSION
-    if (interaction.customId === 'moderator_form') {
-      const age = interaction.fields.getTextInputValue('age');
-      const reason = interaction.fields.getTextInputValue('reason');
-      const experience = interaction.fields.getTextInputValue('experience');
-      const activity = interaction.fields.getTextInputValue('activity');
-      const extra = interaction.fields.getTextInputValue('extra');
-
-      const appChannel = await client.channels.fetch(APPLICATION_CHANNEL_ID);
-
-      const embed = new EmbedBuilder()
-        .setColor('#2b2d31')
-        .setTitle('🛡️ New Moderator Application')
-        .addFields(
-          { name: 'Age', value: age },
-          { name: 'Reason', value: reason },
-          { name: 'Experience', value: experience || 'None provided' },
-          { name: 'Activity', value: activity },
-          { name: 'Extra Info', value: extra || 'None' }
-        )
-        .setFooter({ text: 'Underclips Applications' });
-
-      const actionRow = new ActionRowBuilder().addComponents(
-        new ButtonBuilder()
-          .setCustomId(`accept_application_${interaction.user.id}`)
-          .setLabel('🟩 Accept')
-          .setStyle(ButtonStyle.Success),
-        new ButtonBuilder()
-          .setCustomId(`deny_application_${interaction.user.id}`)
-          .setLabel('🟥 Deny')
-          .setStyle(ButtonStyle.Danger)
-      );
-
-      await appChannel.send({ embeds: [embed], components: [actionRow] });
-      await interaction.reply({ content: 'Your application has been submitted.', ephemeral: true });
-    }
-  }
-});
-
-// 🏓 Ping command
-client.on('messageCreate', (message) => {
-  if (message.content === '!ping') message.reply('🏓 Pong!');
-});
-
-// 🔑 Login
-client.login(process.env.DISCORD_TOKEN);
-
-
+    if (interaction.customId.startsWith('staff
 
 
 
