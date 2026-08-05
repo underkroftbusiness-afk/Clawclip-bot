@@ -85,40 +85,22 @@ client.once('ready', async () => {
     await workChannel.send({ embeds: [workEmbed], components: [workRow] });
   }
 });
-
 // 🎯 INTERACTION HANDLER
 client.on('interactionCreate', async (interaction) => {
   if (interaction.isButton()) {
+
     // 📝 SERVICE SUBMISSION FORM
     if (interaction.customId === 'apply_service') {
       await interaction.showModal({
         custom_id: 'service_form',
         title: '📝 Service Submission',
         components: [
-          {
-            type: 1,
-            components: [{ type: 4, custom_id: 'contact', label: 'Contact', style: 1, required: true }]
-          },
-          {
-            type: 1,
-            components: [{ type: 4, custom_id: 'service_details', label: 'Service', style: 2, required: true }]
-          },
-          {
-            type: 1,
-            components: [{ type: 4, custom_id: 'pricing', label: 'Pricing (Upfront / After / Fixed Amount)', style: 1, required: false }]
-          },
-          {
-            type: 1,
-            components: [{ type: 4, custom_id: 'portfolio', label: 'Portfolio', style: 2, required: false }]
-          },
-          {
-            type: 1,
-            components: [{ type: 4, custom_id: 'extra_info', label: 'Extra Info', style: 2, required: false }]
-          },
-          {
-            type: 1,
-            components: [{ type: 4, custom_id: 'questions', label: 'Questions', style: 2, required: false }]
-          }
+          { type: 1, components: [{ type: 4, custom_id: 'contact', label: 'Contact', style: 1, required: true }] },
+          { type: 1, components: [{ type: 4, custom_id: 'service_details', label: 'Service', style: 2, required: true }] },
+          { type: 1, components: [{ type: 4, custom_id: 'pricing', label: 'Pricing (Upfront / After / Fixed Amount)', style: 1, required: false }] },
+          { type: 1, components: [{ type: 4, custom_id: 'portfolio', label: 'Portfolio', style: 2, required: false }] },
+          { type: 1, components: [{ type: 4, custom_id: 'extra_info', label: 'Extra Info', style: 2, required: false }] },
+          { type: 1, components: [{ type: 4, custom_id: 'questions', label: 'Questions', style: 2, required: false }] }
         ]
       });
     }
@@ -129,37 +111,19 @@ client.on('interactionCreate', async (interaction) => {
         custom_id: 'moderator_form',
         title: '🛡️ Moderator Application',
         components: [
-          {
-            type: 1,
-            components: [{ type: 4, custom_id: 'basic_info', label: 'Basic Info', style: 1, required: true }]
-          },
-          {
-            type: 1,
-            components: [{ type: 4, custom_id: 'timezone', label: 'Timezone', style: 1, required: true }]
-          },
-          {
-            type: 1,
-            components: [{ type: 4, custom_id: 'activity', label: 'Activity', style: 1, required: true }]
-          },
-          {
-            type: 1,
-            components: [{ type: 4, custom_id: 'reason', label: 'Reason', style: 2, required: true }]
-          },
-          {
-            type: 1,
-            components: [{ type: 4, custom_id: 'experience', label: 'Experience', style: 2, required: false }]
-          },
-          {
-            type: 1,
-            components: [{ type: 4, custom_id: 'questions', label: 'Questions', style: 2, required: false }]
-          }
+          { type: 1, components: [{ type: 4, custom_id: 'basic_info', label: 'Basic Info', style: 1, required: true }] },
+          { type: 1, components: [{ type: 4, custom_id: 'timezone', label: 'Timezone', style: 1, required: true }] },
+          { type: 1, components: [{ type: 4, custom_id: 'activity', label: 'Activity', style: 1, required: true }] },
+          { type: 1, components: [{ type: 4, custom_id: 'reason', label: 'Reason', style: 2, required: true }] },
+          { type: 1, components: [{ type: 4, custom_id: 'experience', label: 'Experience', style: 2, required: false }] },
+          { type: 1, components: [{ type: 4, custom_id: 'questions', label: 'Questions', style: 2, required: false }] }
         ]
       });
     }
-
     // 🟩 ACCEPT APPLICATION
     if (interaction.customId.startsWith('accept_application_')) {
       const userId = interaction.customId.replace('accept_application_', '');
+
       const ticketChannel = await interaction.guild.channels.create({
         name: `application-${userId}`,
         type: 0,
@@ -170,16 +134,25 @@ client.on('interactionCreate', async (interaction) => {
       });
 
       await ticketChannel.send({
-        content: "Your submission has been accepted.\nA ticket has been opened so we can discuss the details.\nWe will assist you shortly."
+        content:
+          "Your submission has been accepted.\n" +
+          "A ticket has been opened so we can discuss the details.\n" +
+          "We will assist you shortly."
       });
 
-      await interaction.reply({ content: `Accepted — Ticket created: ${ticketChannel}`, ephemeral: false });
+      await interaction.reply({
+        content: `Accepted — Ticket created: ${ticketChannel}`,
+        ephemeral: false
+      });
     }
 
     // 🟥 DENY APPLICATION
     if (interaction.customId.startsWith('deny_application_')) {
       await interaction.reply({
-        content: `🟥 Denied by <@${interaction.user.id}>\nYour submission was not approved.\nIf you need clarification, contact staff in support.`,
+        content:
+          `🟥 Denied by <@${interaction.user.id}>\n` +
+          `Your submission was not approved.\n` +
+          `If you need clarification, contact staff in support.`,
         ephemeral: false
       });
     }
@@ -188,15 +161,26 @@ client.on('interactionCreate', async (interaction) => {
     if (interaction.customId.startsWith('staff_close_')) {
       const channelId = interaction.customId.replace('staff_close_', '');
       const channel = interaction.guild.channels.cache.get(channelId);
-      if (!channel) return interaction.reply({ content: "Channel not found.", ephemeral: true });
 
-      await interaction.reply({ content: "Ticket closed. Deleting in 3 seconds...", ephemeral: true });
+      if (!channel) {
+        return interaction.reply({
+          content: "Channel not found.",
+          ephemeral: true
+        });
+      }
+
+      await interaction.reply({
+        content: "Ticket closed. Deleting in 3 seconds...",
+        ephemeral: true
+      });
+
       setTimeout(() => channel.delete().catch(() => {}), 3000);
     }
   }
-
   // 📨 HANDLE MODAL SUBMISSIONS
   if (interaction.isModalSubmit()) {
+
+    // SERVICE SUBMISSION
     if (interaction.customId === 'service_form') {
       const contact = interaction.fields.getTextInputValue('contact');
       const service = interaction.fields.getTextInputValue('service_details');
@@ -206,11 +190,11 @@ client.on('interactionCreate', async (interaction) => {
       const questions = interaction.fields.getTextInputValue('questions');
 
       const appChannel = await interaction.guild.channels.fetch(APPLICATION_CHANNEL_ID);
+
       const embed = new EmbedBuilder()
         .setColor('#2b2d31')
         .setTitle('📝 New Service Submission')
         .setDescription(
-          `**User:** <@${interaction.user.id
           `**User:** <@${interaction.user.id}>\n\n` +
           `**Contact:** ${contact}\n\n` +
           `**Service:** ${service}\n\n` +
@@ -233,14 +217,10 @@ client.on('interactionCreate', async (interaction) => {
       );
 
       await appChannel.send({ embeds: [embed], components: [row] });
-
-      await interaction.reply({
-        content: "✅ Your submission has been sent.",
-        ephemeral: true
-      });
+      await interaction.reply({ content: "✅ Your submission has been sent.", ephemeral: true });
     }
 
-    // 🛡️ MODERATOR APPLICATION SUBMISSION
+    // MODERATOR SUBMISSION
     if (interaction.customId === 'moderator_form') {
       const basic = interaction.fields.getTextInputValue('basic_info');
       const timezone = interaction.fields.getTextInputValue('timezone');
@@ -277,16 +257,14 @@ client.on('interactionCreate', async (interaction) => {
       );
 
       await appChannel.send({ embeds: [embed], components: [row] });
-
-      await interaction.reply({
-        content: "✅ Your application has been submitted.",
-        ephemeral: true
-      });
+      await interaction.reply({ content: "✅ Your application has been submitted.", ephemeral: true });
     }
   }
 });
+
 // 🔑 BOT LOGIN
 client.login(process.env.TOKEN);
+
 
 
 
