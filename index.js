@@ -1,9 +1,9 @@
-const { 
-  Client, 
-  GatewayIntentBits, 
-  Partials, 
-  ActionRowBuilder, 
-  ButtonBuilder, 
+const {
+  Client,
+  GatewayIntentBits,
+  Partials,
+  ActionRowBuilder,
+  ButtonBuilder,
   ButtonStyle,
   EmbedBuilder,
   PermissionsBitField
@@ -19,45 +19,19 @@ const client = new Client({
   partials: [Partials.Channel]
 });
 
-// 🧩 CHANGE THESE
+// CHANNEL IDs
 const SUPPORT_CHANNEL_ID = "1516092800469303437";
 const RULES_CHANNEL_ID = "1516812179410780261";
 const CAMPAIGN_INFO_CHANNEL_ID = "1515782662412046416";
 const CAMPAIGN_RULES_CHANNEL_ID = "1520485646311882945";
 const HOW_TO_CLIP_CHANNEL_ID = "1534171904137625631";
 
-// 🧩 APPLICATION SYSTEM CHANNELS
-const WORK_WITH_US_CHANNEL_ID = "1532762065758978190";      
-const APPLICATION_CHANNEL_ID = "1534208165443404020";        
+const WORK_WITH_US_CHANNEL_ID = "1532762065758978190";
+const APPLICATION_CHANNEL_ID = "1534208165443404020";
 
-// 🔑 Bot online
+// BOT READY
 client.once('ready', async () => {
-  console.log(`🔑 Bot is online as ${client.user.tag}`);
-
-  // 🎟️ Support message
-  const supportChannel = await client.channels.fetch(SUPPORT_CHANNEL_ID);
-  const supportMessages = await supportChannel.messages.fetch({ limit: 20 });
-  const supportExisting = supportMessages.find(
-    m => m.author.id === client.user.id && m.embeds.length > 0
-  );
-
-  if (!supportExisting) {
-    const embed = new EmbedBuilder()
-      .setColor('#2b2d31')
-      .setTitle('❓ Need help?')
-      .setDescription('Click the button below to open a support ticket.')
-      .setFooter({ text: 'Underclips Support System' });
-
-    const row = new ActionRowBuilder().addComponents(
-      new ButtonBuilder()
-        .setCustomId('create_ticket')
-        .setLabel('🎟️ Open Support Ticket')
-        .setStyle(ButtonStyle.Primary)
-    );
-
-    await supportChannel.send({ embeds: [embed], components: [row] });
-  }
-
+  console.log(`Bot online as ${client.user.tag}`);
   // 📜 RULES MESSAGE
   const rulesChannel = await client.channels.fetch(RULES_CHANNEL_ID);
   const rulesMessages = await rulesChannel.messages.fetch({ limit: 20 });
@@ -85,6 +59,7 @@ client.once('ready', async () => {
 
     await rulesChannel.send({ embeds: [rulesEmbed] });
   }
+
   // 💰 CAMPAIGN INFO
   const campaignInfoChannel = await client.channels.fetch(CAMPAIGN_INFO_CHANNEL_ID);
   const campaignMessages = await campaignInfoChannel.messages.fetch({ limit: 20 });
@@ -157,7 +132,7 @@ client.once('ready', async () => {
     await clipChannel.send({ embeds: [clipEmbed] });
   }
 
-  // 📋 SUBMIT A REQUEST — UPDATED TITLE
+  // 📋 UNDERCLIPS — SUBMIT A REQUEST
   const workChannel = await client.channels.fetch(WORK_WITH_US_CHANNEL_ID);
   const workMessages = await workChannel.messages.fetch({ limit: 20 });
   const workExisting = workMessages.find(
@@ -169,10 +144,8 @@ client.once('ready', async () => {
       .setColor('#2b2d31')
       .setTitle('📋 Underclips — Submit a Request')
       .setDescription(
-        "📝 **Service Submission**\n" +
-        "Offer your services or create a campaign.\n\n" +
-        "🛡️ **Moderator**\n" +
-        "Apply to be a moderator.\n\n" +
+        "📝 **Service Submission**\nOffer your services or create a campaign.\n\n" +
+        "🛡️ **Moderator**\nApply to be a moderator.\n\n" +
         "———————————————\nClick a button below to begin."
       )
       .setFooter({ text: 'Underclips — Applications' });
@@ -191,7 +164,7 @@ client.once('ready', async () => {
     await workChannel.send({ embeds: [workEmbed], components: [workRow] });
   }
 });
-// 👋 Auto DM
+// 👋 AUTO DM ON JOIN
 client.on('guildMemberAdd', async (member) => {
   try {
     await member.send(
@@ -202,92 +175,92 @@ client.on('guildMemberAdd', async (member) => {
   }
 });
 
-// INTERACTIONS
+// 🎯 INTERACTION HANDLER
 client.on('interactionCreate', async (interaction) => {
 
-  // BUTTONS
+  // BUTTON HANDLING
   if (interaction.isButton()) {
 
-    // 🎟️ Support ticket
+    // 🎟️ CREATE SUPPORT TICKET
     if (interaction.customId === 'create_ticket') {
-      try {
-        await interaction.deferReply({ ephemeral: true });
+      await interaction.deferReply({ ephemeral: true });
 
-        const ticketChannel = await interaction.guild.channels.create({
-          name: `ticket-${interaction.user.username}`,
-          type: 0,
-          topic: `Support ticket for ${interaction.user.tag}`,
-          permissionOverwrites: [
-            {
-              id: interaction.guild.roles.everyone,
-              deny: [
-                PermissionsBitField.Flags.ViewChannel,
-                PermissionsBitField.Flags.SendMessages
-              ]
-            },
-            {
-              id: interaction.user.id,
-              allow: [
-                PermissionsBitField.Flags.ViewChannel,
-                PermissionsBitField.Flags.SendMessages,
-                PermissionsBitField.Flags.ReadMessageHistory
-              ]
-            },
-            {
-              id: client.user.id,
-              allow: [
-                PermissionsBitField.Flags.ViewChannel,
-                PermissionsBitField.Flags.SendMessages,
-                PermissionsBitField.Flags.ManageChannels,
-                PermissionsBitField.Flags.EmbedLinks
-              ]
-            }
-          ]
-        });
+      const ticketChannel = await interaction.guild.channels.create({
+        name: `ticket-${interaction.user.username}`,
+        type: 0,
+        topic: `Support ticket for ${interaction.user.tag}`,
+        permissionOverwrites: [
+          {
+            id: interaction.guild.roles.everyone,
+            deny: [
+              PermissionsBitField.Flags.ViewChannel,
+              PermissionsBitField.Flags.SendMessages
+            ]
+          },
+          {
+            id: interaction.user.id,
+            allow: [
+              PermissionsBitField.Flags.ViewChannel,
+              PermissionsBitField.Flags.SendMessages,
+              PermissionsBitField.Flags.ReadMessageHistory
+            ]
+          },
+          {
+            id: client.user.id,
+            allow: [
+              PermissionsBitField.Flags.ViewChannel,
+              PermissionsBitField.Flags.SendMessages,
+              PermissionsBitField.Flags.ManageChannels,
+              PermissionsBitField.Flags.EmbedLinks
+            ]
+          }
+        ]
+      });
 
-        const ticketEmbed = new EmbedBuilder()
-          .setColor('#2b2d31')
-          .setTitle('🎫 Ticket Created')
-          .setDescription(`Welcome <@${interaction.user.id}>. Someone will help you shortly.\nIf your issue is solved, press the button below to close your ticket.`)
-          .setFooter({ text: 'Underclips Support' });
+      const ticketEmbed = new EmbedBuilder()
+        .setColor('#2b2d31')
+        .setTitle('🎫 Ticket Created')
+        .setDescription(
+          `Welcome <@${interaction.user.id}>.\nSomeone will help you shortly.\n\n` +
+          `If your issue is solved, press the button below to close your ticket.`
+        )
+        .setFooter({ text: 'Underclips Support' });
 
-        const closeRow = new ActionRowBuilder().addComponents(
-          new ButtonBuilder()
-            .setCustomId('close_ticket')
-            .setLabel('🔒 Close Ticket')
-            .setStyle(ButtonStyle.Danger)
-        );
+      const closeRow = new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+          .setCustomId('close_ticket')
+          .setLabel('🔒 Close Ticket')
+          .setStyle(ButtonStyle.Danger)
+      );
 
-        await ticketChannel.send({ embeds: [ticketEmbed], components: [closeRow] });
+      await ticketChannel.send({ embeds: [ticketEmbed], components: [closeRow] });
 
-        await interaction.editReply({
-          content: `Your ticket has been created: ${ticketChannel}`,
-          ephemeral: true
-        });
-
-      } catch (err) {
-        console.error(err);
-        await interaction.editReply({
-          content: 'Something went wrong while creating your ticket.',
-          ephemeral: true
-        });
-      }
+      await interaction.editReply({
+        content: `Your ticket has been created: ${ticketChannel}`,
+        ephemeral: true
+      });
     }
 
-    // Close support ticket
+    // 🔒 CLOSE SUPPORT TICKET
     if (interaction.customId === 'close_ticket') {
       const channel = interaction.channel;
       const isOwner = channel.name.includes(interaction.user.username);
 
       if (!isOwner) {
-        return interaction.reply({ content: "Only the ticket owner can close this.", ephemeral: true });
+        return interaction.reply({
+          content: "Only the ticket owner can close this.",
+          ephemeral: true
+        });
       }
 
-      await interaction.reply({ content: "Ticket closed. Deleting in 3 seconds...", ephemeral: true });
+      await interaction.reply({
+        content: "Ticket closed. Deleting in 3 seconds...",
+        ephemeral: true
+      });
+
       setTimeout(() => channel.delete().catch(() => {}), 3000);
     }
-
-    // 📝 SERVICE SUBMISSION FORM — UPDATED
+    // 📝 SERVICE SUBMISSION FORM
     if (interaction.customId === 'apply_service') {
       await interaction.showModal({
         custom_id: 'service_form',
@@ -375,7 +348,7 @@ client.on('interactionCreate', async (interaction) => {
       });
     }
 
-    // 🛡️ MODERATOR FORM — UPDATED
+    // 🛡️ MODERATOR APPLICATION FORM
     if (interaction.customId === 'apply_moderator') {
       await interaction.showModal({
         custom_id: 'moderator_form',
@@ -462,8 +435,7 @@ client.on('interactionCreate', async (interaction) => {
         ]
       });
     }
-
-    // 🟩 ACCEPT APPLICATION — UPDATED MESSAGE
+    // 🟩 ACCEPT APPLICATION
     if (interaction.customId.startsWith('accept_application_')) {
       const userId = interaction.customId.replace('accept_application_', '');
 
@@ -520,7 +492,7 @@ client.on('interactionCreate', async (interaction) => {
       });
     }
 
-    // 🟥 DENY APPLICATION — ALREADY CORRECT
+    // 🟥 DENY APPLICATION
     if (interaction.customId.startsWith('deny_application_')) {
       const userId = interaction.customId.replace('deny_application_', '');
 
@@ -534,7 +506,123 @@ client.on('interactionCreate', async (interaction) => {
     }
 
     // 🔒 STAFF CLOSE APPLICATION TICKET
-    if (interaction.customId.startsWith('staff
+    if (interaction.customId.startsWith('staff_close_')) {
+      const channelId = interaction.customId.replace('staff_close_', '');
+      const channel = interaction.guild.channels.cache.get(channelId);
+
+      if (!channel) {
+        return interaction.reply({
+          content: "Channel not found.",
+          ephemeral: true
+        });
+      }
+
+      await interaction.reply({
+        content: "Ticket closed. Deleting in 3 seconds...",
+        ephemeral: true
+      });
+
+      setTimeout(() => channel.delete().catch(() => {}), 3000);
+    }
+  }
+  // 📝 MODAL SUBMISSION HANDLING
+  if (interaction.isModalSubmit()) {
+
+    // SERVICE FORM SUBMISSION
+    if (interaction.customId === 'service_form') {
+      const contact = interaction.fields.getTextInputValue('contact');
+      const service_details = interaction.fields.getTextInputValue('service_details');
+      const pricing = interaction.fields.getTextInputValue('pricing');
+      const portfolio = interaction.fields.getTextInputValue('portfolio');
+      const extra_info = interaction.fields.getTextInputValue('extra_info');
+      const questions = interaction.fields.getTextInputValue('questions');
+
+      const appChannel = await interaction.guild.channels.fetch(APPLICATION_CHANNEL_ID);
+
+      const embed = new EmbedBuilder()
+        .setColor('#2b2d31')
+        .setTitle('📝 New Service Submission')
+        .setDescription(
+          `**User:** <@${interaction.user.id}>\n\n` +
+          `**Contact:** ${contact}\n\n` +
+          `**Service:** ${service_details}\n\n` +
+          `**Pricing:** ${pricing || "None"}\n\n` +
+          `**Portfolio:** ${portfolio || "None"}\n\n` +
+          `**Extra Info:** ${extra_info || "None"}\n\n` +
+          `**Questions:** ${questions || "None"}`
+        )
+        .setFooter({ text: 'Underclips — Service Submission' });
+
+      const row = new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+          .setCustomId(`accept_application_${interaction.user.id}`)
+          .setLabel('Accept')
+          .setStyle(ButtonStyle.Success),
+        new ButtonBuilder()
+          .setCustomId(`deny_application_${interaction.user.id}`)
+          .setLabel('Deny')
+          .setStyle(ButtonStyle.Danger)
+      );
+
+      await appChannel.send({ embeds: [embed], components: [row] });
+
+      await interaction.reply({
+        content: "Your submission has been sent.",
+        ephemeral: true
+      });
+    }
+
+    // MODERATOR FORM SUBMISSION
+    if (interaction.customId === 'moderator_form') {
+      const basic_info = interaction.fields.getTextInputValue('basic_info');
+      const timezone = interaction.fields.getTextInputValue('timezone');
+      const activity = interaction.fields.getTextInputValue('activity');
+      const reason = interaction.fields.getTextInputValue('reason');
+      const experience = interaction.fields.getTextInputValue('experience');
+      const questions = interaction.fields.getTextInputValue('questions');
+
+      const appChannel = await interaction.guild.channels.fetch(APPLICATION_CHANNEL_ID);
+
+      const embed = new EmbedBuilder()
+        .setColor('#2b2d31')
+        .setTitle('🛡️ New Moderator Application')
+        .setDescription(
+          `**User:** <@${interaction.user.id}>\n\n` +
+          `**Basic Info:** ${basic_info}\n\n` +
+          `**Timezone:** ${timezone}\n\n` +
+          `**Activity:** ${activity}\n\n` +
+          `**Reason:** ${reason}\n\n` +
+          `**Experience:** ${experience || "None"}\n\n` +
+          `**Questions:** ${questions || "None"}`
+        )
+        .setFooter({ text: 'Underclips — Moderator Application' });
+
+      const row = new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+          .setCustomId(`accept_application_${interaction.user.id}`)
+          .setLabel('Accept')
+          .setStyle(ButtonStyle.Success),
+        new ButtonBuilder()
+          .setCustomId(`deny_application_${interaction.user.id}`)
+          .setLabel('Deny')
+          .setStyle(ButtonStyle.Danger)
+      );
+
+      await appChannel.send({ embeds: [embed], components: [row] });
+
+      await interaction.reply({
+        content: "Your application has been submitted.",
+        ephemeral: true
+      });
+    }
+  }
+});
+});
+// 🔑 BOT LOGIN
+client.login(process.env.TOKEN);
+
+
+
 
 
 
