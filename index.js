@@ -24,10 +24,9 @@ const SUPPORT_CHANNEL_ID = "1516092800469303437";
 const RULES_CHANNEL_ID = "1516812179410780261";
 const WORK_WITH_US_CHANNEL_ID = "1532762065758978190";
 const APPLICATION_CHANNEL_ID = "1534208165443404020";
-
-// BOT READY
 client.once('ready', async () => {
   console.log(`Bot online as ${client.user.tag}`);
+
   // 📜 RULES MESSAGE
   const rulesChannel = await client.channels.fetch(RULES_CHANNEL_ID);
   const rulesMessages = await rulesChannel.messages.fetch({ limit: 20 });
@@ -91,14 +90,14 @@ client.on('interactionCreate', async (interaction) => {
 
     // 📝 SERVICE SUBMISSION FORM
     if (interaction.customId === 'apply_service') {
-      await interaction.deferReply({ ephemeral: true }); // FIX TIMEOUT
+      await interaction.deferReply({ ephemeral: true });
       await interaction.showModal({
         custom_id: 'service_form',
         title: '📝 Service Submission',
         components: [
           { type: 1, components: [{ type: 4, custom_id: 'contact', label: 'Contact', style: 1, required: true }] },
           { type: 1, components: [{ type: 4, custom_id: 'service_details', label: 'Service', style: 2, required: true }] },
-          { type: 1, components: [{ type: 4, custom_id: 'pricing', label: 'Pricing (Upfront / After / Fixed Amount)', style: 1 }] },
+          { type: 1, components: [{ type: 4, custom_id: 'pricing', label: 'Pricing', style: 1 }] },
           { type: 1, components: [{ type: 4, custom_id: 'portfolio', label: 'Portfolio', style: 2 }] },
           { type: 1, components: [{ type: 4, custom_id: 'extra_info', label: 'Extra Info', style: 2 }] },
           { type: 1, components: [{ type: 4, custom_id: 'questions', label: 'Questions', style: 2 }] }
@@ -108,7 +107,7 @@ client.on('interactionCreate', async (interaction) => {
 
     // 🛡️ MODERATOR APPLICATION FORM
     if (interaction.customId === 'apply_moderator') {
-      await interaction.deferReply({ ephemeral: true }); // FIX TIMEOUT
+      await interaction.deferReply({ ephemeral: true });
       await interaction.showModal({
         custom_id: 'moderator_form',
         title: '🛡️ Moderator Application',
@@ -229,8 +228,5 @@ client.on('interactionCreate', async (interaction) => {
   }
 });
 client.login(process.env.TOKEN);
-
-
-
 
 
