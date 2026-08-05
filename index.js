@@ -54,7 +54,6 @@ client.once('ready', async () => {
 
     await rulesChannel.send({ embeds: [rulesEmbed] });
   }
-
   // 📋 UNDERCLIPS — SUBMIT A REQUEST
   const workChannel = await client.channels.fetch(WORK_WITH_US_CHANNEL_ID);
   const workMessages = await workChannel.messages.fetch({ limit: 20 });
@@ -66,7 +65,7 @@ client.once('ready', async () => {
       .setTitle('📋 Underclips — Submit a Request')
       .setDescription(
         "📝 **Service Submission**\nSubmit a service you can provide us or a campaign you want to start.\n\n" +
-        "🛡️ **Moderator**\nApply to be a moderator and help support the community by reviewing submissions, assisting members, and keeping everything organized. Submit your details to begin.\n\n" +
+        "🛡️ **Moderator**\nApply to be a moderator and help support the community.\n\n" +
         "———————————————\nClick a button below to begin."
       )
       .setFooter({ text: 'Underclips — Applications' });
@@ -264,9 +263,6 @@ client.on('interactionCreate', async (interaction) => {
 
 // 🔑 BOT LOGIN
 client.login(process.env.TOKEN);
-
-
-
 
 
 
