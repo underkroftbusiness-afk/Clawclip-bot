@@ -1,6 +1,4 @@
 // part1.js
-require('dotenv').config();
-
 const {
   Client,
   GatewayIntentBits,
@@ -10,9 +8,6 @@ const {
   ButtonStyle,
   EmbedBuilder,
   PermissionsBitField,
-  ModalBuilder,
-  TextInputBuilder,
-  TextInputStyle,
   ChannelType
 } = require('discord.js');
 
@@ -26,22 +21,65 @@ const client = new Client({
   partials: [Partials.Channel]
 });
 
-// CHANNEL IDs (replace with your real IDs)
+// ---------------- CONFIG (replace with your real IDs) ----------------
 const SUPPORT_CHANNEL_ID = "1516092800469303437";
 const RULES_CHANNEL_ID = "1516812179410780261";
+const CAMPAIGN_INFO_CHANNEL_ID = "1515782662412046416";
+const CAMPAIGN_RULES_CHANNEL_ID = "1520485646311882945";
+const HOW_TO_CLIP_CHANNEL_ID = "1534171904137625631";
+
 const WORK_WITH_US_CHANNEL_ID = "1532762065758978190";
 const APPLICATION_CHANNEL_ID = "1534208165443404020";
+// ---------------------------------------------------------------------
 
 client.once('ready', async () => {
-  console.log(`Bot online as ${client.user.tag}`);
+  console.log(`🔑 Bot is online as ${client.user.tag}`);
 
+  // Helper to safely fetch a channel and ensure it's text-capable
+  async function fetchTextChannel(id) {
+    try {
+      const ch = await client.channels.fetch(id);
+      if (!ch || !ch.isTextBased()) return null;
+      return ch;
+    } catch {
+      return null;
+    }
+  }
+
+  // Support embed (sends once)
   try {
-    const rulesChannel = await client.channels.fetch(RULES_CHANNEL_ID);
-    if (!rulesChannel || !rulesChannel.isTextBased()) {
-      console.warn('Rules channel not found or not text-based.');
+    const supportChannel = await fetchTextChannel(SUPPORT_CHANNEL_ID);
+    if (supportChannel) {
+      const supportMessages = await supportChannel.messages.fetch({ limit: 20 }).catch(() => []);
+      const supportExisting = supportMessages.find && supportMessages.find(m => m.author?.id === client.user.id && m.embeds.length > 0);
+
+      if (!supportExisting) {
+        const embed = new EmbedBuilder()
+          .setColor('#2b2d31')
+          .setTitle('❓ Need help?')
+          .setDescription('Click the button below to open a support ticket.')
+          .setFooter({ text: 'Underclips Support System' });
+
+        const row = new ActionRowBuilder().addComponents(
+          new ButtonBuilder().setCustomId('create_ticket').setLabel('🎟️ Open Support Ticket').setStyle(ButtonStyle.Primary)
+        );
+
+        await supportChannel.send({ embeds: [embed], components: [row] }).catch(console.error);
+      }
     } else {
-      const rulesMessages = await rulesChannel.messages.fetch({ limit: 20 });
-      const rulesExisting = rulesMessages.find(m => m.author?.id === client.user.id && m.embeds.length > 0);
+      console.warn('Support channel not found or not text-based.');
+    }
+  } catch (err) {
+    console.error('Error sending support message:', err);
+  }
+
+  // Rules embed (sends once)
+  try {
+    const rulesChannel = await fetchTextChannel(RULES_CHANNEL_ID);
+    if (rulesChannel) {
+      const rulesMessages = await rulesChannel.messages.fetch({ limit: 20 }).catch(() => []);
+      const rulesExisting = rulesMessages.find && rulesMessages.find(m => m.author?.id === client.user.id && m.embeds.length > 0);
+
       if (!rulesExisting) {
         const rulesEmbed = new EmbedBuilder()
           .setColor('#2b2d31')
@@ -60,27 +98,121 @@ client.once('ready', async () => {
           )
           .setFooter({ text: 'Underclips Server Rules' });
 
-        await rulesChannel.send({ embeds: [rulesEmbed] });
+        await rulesChannel.send({ embeds: [rulesEmbed] }).catch(console.error);
       }
+    } else {
+      console.warn('Rules channel not found or not text-based.');
     }
   } catch (err) {
-    console.error('Failed to send rules embed:', err);
+    console.error('Error sending rules message:', err);
   }
 
+  // Campaign info (sends once)
   try {
-    const workChannel = await client.channels.fetch(WORK_WITH_US_CHANNEL_ID);
-    if (!workChannel || !workChannel.isTextBased()) {
-      console.warn('Work channel not found or not text-based.');
+    const campaignInfoChannel = await fetchTextChannel(CAMPAIGN_INFO_CHANNEL_ID);
+    if (campaignInfoChannel) {
+      const campaignMessages = await campaignInfoChannel.messages.fetch({ limit: 20 }).catch(() => []);
+      const campaignExisting = campaignMessages.find && campaignMessages.find(m => m.author?.id === client.user.id && m.embeds.length > 0);
+
+      if (!campaignExisting) {
+        const payoutEmbed = new EmbedBuilder()
+          .setColor('#2b2d31')
+          .setTitle('💰 Payout Information')
+          .setDescription(
+            "**Payrate System** Earn a fixed amount per views.\n\n" +
+            "**Pot System** Earn based on your share of total views.\n\n" +
+            "**Minimum Views** 1,000 views required.\n\n" +
+            "**Payout Timeline** Paid after campaign ends.\n\n" +
+            "**Payment Method** Depends on sponsor.\n\n" +
+            "**Payment Details** Sent to your saved payout info."
+          )
+          .setFooter({ text: 'Underclips Campaign Info' });
+
+        await campaignInfoChannel.send({ embeds: [payoutEmbed] }).catch(console.error);
+      }
     } else {
-      const workMessages = await workChannel.messages.fetch({ limit: 20 });
-      const workExisting = workMessages.find(m => m.author?.id === client.user.id && m.embeds.length > 0);
+      console.warn('Campaign info channel not found or not text-based.');
+    }
+  } catch (err) {
+    console.error('Error sending campaign info:', err);
+  }
+
+  // Campaign rules (sends once)
+  try {
+    const campaignRulesChannel = await fetchTextChannel(CAMPAIGN_RULES_CHANNEL_ID);
+    if (campaignRulesChannel) {
+      const campaignRulesMessages = await campaignRulesChannel.messages.fetch({ limit: 20 }).catch(() => []);
+      const campaignRulesExisting = campaignRulesMessages.find && campaignRulesMessages.find(m => m.author?.id === client.user.id && m.embeds.length > 0);
+
+      if (!campaignRulesExisting) {
+        const campaignRulesEmbed = new EmbedBuilder()
+          .setColor('#2b2d31')
+          .setTitle('📋 Campaign Rules')
+          .setDescription(
+            "**Real Engagement Only** No bots.\n\n" +
+            "**Audience Must Match** English campaigns need 50%+ English audience.\n\n" +
+            "**Follow Requirements** Breaking rules = rejected.\n\n" +
+            "**Do Not Hide Metrics** Keep stats visible.\n\n" +
+            "**No Low‑Effort Posts** Must be real content.\n\n" +
+            "**No Duplicate Posts** No double uploads.\n\n" +
+            "**Posts Stay Public** Until payout.\n\n" +
+            "**Staff Decisions Final** Breaking rules = action."
+          )
+          .setFooter({ text: 'Underclips Campaign Rules' });
+
+        await campaignRulesChannel.send({ embeds: [campaignRulesEmbed] }).catch(console.error);
+      }
+    } else {
+      console.warn('Campaign rules channel not found or not text-based.');
+    }
+  } catch (err) {
+    console.error('Error sending campaign rules:', err);
+  }
+
+  // Clipping tips (sends once)
+  try {
+    const clipChannel = await fetchTextChannel(HOW_TO_CLIP_CHANNEL_ID);
+    if (clipChannel) {
+      const clipMessages = await clipChannel.messages.fetch({ limit: 20 }).catch(() => []);
+      const clipExisting = clipMessages.find && clipMessages.find(m => m.author?.id === client.user.id && m.embeds.length > 0);
+
+      if (!clipExisting) {
+        const clipEmbed = new EmbedBuilder()
+          .setColor('#2b2d31')
+          .setTitle('📘 Clipping-tips')
+          .setDescription(
+            "**The Hook**\nYour first 3 seconds decide if viewers stay. Strong openings increase watch time and push your video further. Create quick curiosity or emotion.\n\n" +
+            "**Clip Selection & Length**\nChoose moments that feel viral or instantly grab attention. Short clips perform best. IG: ~40s • TikTok: ~30s • Shorts: 15–20s.\n\n" +
+            "**Editing**\nYou can use CapCut or OpusClip to edit your clips. Add clear, bold captions to keep viewers focused, and choose trending audio to help the algorithm push your content further.\n\n" +
+            "**Posting Strategy**\nPost consistently throughout the day. Use hashtags that match your niche."
+          )
+          .setFooter({ text: 'Underclips Clipping Guide' });
+
+        await clipChannel.send({ embeds: [clipEmbed] }).catch(console.error);
+      }
+    } else {
+      console.warn('Clipping tips channel not found or not text-based.');
+    }
+  } catch (err) {
+    console.error('Error sending clipping tips:', err);
+  }
+
+  // Work with us / applications (sends once)
+  try {
+    const workChannel = await fetchTextChannel(WORK_WITH_US_CHANNEL_ID);
+    if (workChannel) {
+      const workMessages = await workChannel.messages.fetch({ limit: 20 }).catch(() => []);
+      const workExisting = workMessages.find && workMessages.find(m => m.author?.id === client.user.id && m.embeds.length > 0);
+
       if (!workExisting) {
         const workEmbed = new EmbedBuilder()
           .setColor('#2b2d31')
-          .setTitle('📋 Underclips — Submit a Request')
+          .setTitle('📋 Submit a Request')
           .setDescription(
-            "📝 **Service Submission**\nSubmit a service you can provide us or a campaign you want to start.\n\n" +
-            "🛡️ **Moderator**\nApply to be a moderator and help support the community.\n\n" +
+            "📝 **Service Submission**\n" +
+            "Interested in offering your services or creating your own campaign? Submit your details and we will review your request.\n\n" +
+            "🛡️ **Moderator**\n" +
+            "Apply to be a moderator and support the community. Submit your details to begin.\n\n" +
             "———————————————\nClick a button below to begin."
           )
           .setFooter({ text: 'Underclips — Applications' });
@@ -90,212 +222,166 @@ client.once('ready', async () => {
           new ButtonBuilder().setCustomId('apply_moderator').setLabel('🛡️ Moderator').setStyle(ButtonStyle.Danger)
         );
 
-        await workChannel.send({ embeds: [workEmbed], components: [workRow] });
+        await workChannel.send({ embeds: [workEmbed], components: [workRow] }).catch(console.error);
       }
+    } else {
+      console.warn('Work with us channel not found or not text-based.');
     }
   } catch (err) {
-    console.error('Failed to send work embed:', err);
+    console.error('Error sending work with us embed:', err);
   }
 });
-// part2.js
-client.on('interactionCreate', async (interaction) => {
+// Accept application -> create ticket for applicant (no emoji in reply)
+if (interaction.customId.startsWith('accept_application_')) {
+  const userId = interaction.customId.replace('accept_application_', '');
   try {
-    if (interaction.isButton()) {
-      if (interaction.customId === 'apply_service') {
-        const modal = new ModalBuilder().setCustomId('service_form').setTitle('📝 Service Submission');
+    const guild = interaction.guild;
+    if (!guild) return interaction.reply({ content: 'Guild not found.', ephemeral: true }).catch(() => {});
 
-        const contactInput = new TextInputBuilder().setCustomId('contact').setLabel('Contact').setStyle(TextInputStyle.Short).setRequired(true);
-        const serviceInput = new TextInputBuilder().setCustomId('service_details').setLabel('Service').setStyle(TextInputStyle.Paragraph).setRequired(true);
-        const pricingInput = new TextInputBuilder().setCustomId('pricing').setLabel('Pricing (Upfront / After / Fixed Amount)').setStyle(TextInputStyle.Short).setRequired(false);
-        const portfolioInput = new TextInputBuilder().setCustomId('portfolio').setLabel('Portfolio').setStyle(TextInputStyle.Paragraph).setRequired(false);
-        const extraInput = new TextInputBuilder().setCustomId('extra_info').setLabel('Extra Info').setStyle(TextInputStyle.Paragraph).setRequired(false);
-
-        modal.addComponents(
-          new ActionRowBuilder().addComponents(contactInput),
-          new ActionRowBuilder().addComponents(serviceInput),
-          new ActionRowBuilder().addComponents(pricingInput),
-          new ActionRowBuilder().addComponents(portfolioInput),
-          new ActionRowBuilder().addComponents(extraInput)
-        );
-
-        await interaction.showModal(modal);
-        return;
-      }
-
-      if (interaction.customId === 'apply_moderator') {
-        const modal = new ModalBuilder().setCustomId('moderator_form').setTitle('🛡️ Moderator Application');
-
-        const basicInput = new TextInputBuilder().setCustomId('basic_info').setLabel('Basic Info').setStyle(TextInputStyle.Short).setRequired(true);
-        const timezoneInput = new TextInputBuilder().setCustomId('timezone').setLabel('Timezone').setStyle(TextInputStyle.Short).setRequired(true);
-        const activityInput = new TextInputBuilder().setCustomId('activity').setLabel('Activity (hours per day/week)').setStyle(TextInputStyle.Short).setRequired(true);
-        const reasonInput = new TextInputBuilder().setCustomId('reason').setLabel('Why do you want to be a moderator?').setStyle(TextInputStyle.Paragraph).setRequired(true);
-        const experienceInput = new TextInputBuilder().setCustomId('experience').setLabel('Experience (optional)').setStyle(TextInputStyle.Paragraph).setRequired(false);
-
-        modal.addComponents(
-          new ActionRowBuilder().addComponents(basicInput),
-          new ActionRowBuilder().addComponents(timezoneInput),
-          new ActionRowBuilder().addComponents(activityInput),
-          new ActionRowBuilder().addComponents(reasonInput),
-          new ActionRowBuilder().addComponents(experienceInput)
-        );
-
-        await interaction.showModal(modal);
-        return;
-      }
-
-      if (interaction.customId.startsWith('accept_application_')) {
-        const userId = interaction.customId.replace('accept_application_', '');
-        const guild = interaction.guild;
-        if (!guild) {
-          await interaction.reply({ content: 'Guild not found.', ephemeral: true });
-          return;
+    const ticketChannel = await guild.channels.create({
+      name: `application-${userId}`.slice(0, 90),
+      type: ChannelType.GuildText,
+      topic: `Application accepted for ${userId}`,
+      permissionOverwrites: [
+        {
+          id: guild.roles.everyone.id || guild.id,
+          deny: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages]
+        },
+        {
+          id: userId,
+          allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages, PermissionsBitField.Flags.ReadMessageHistory]
+        },
+        {
+          id: client.user.id,
+          allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages, PermissionsBitField.Flags.ManageChannels, PermissionsBitField.Flags.EmbedLinks]
         }
+      ]
+    });
 
-        const ticketChannel = await guild.channels.create({
-          name: `application-${userId}`,
-          type: ChannelType.GuildText,
-          permissionOverwrites: [
-            { id: guild.roles.everyone.id || guild.id, deny: [PermissionsBitField.Flags.ViewChannel] },
-            { id: userId, allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages, PermissionsBitField.Flags.ReadMessageHistory] }
-          ]
-        });
+    const closeRow = new ActionRowBuilder().addComponents(
+      new ButtonBuilder().setCustomId(`staff_close_${ticketChannel.id}`).setLabel('🔒 Close Ticket').setStyle(ButtonStyle.Danger)
+    );
 
-        await ticketChannel.send({
-          content:
-            "Your submission has been accepted.\n" +
-            "A ticket has been opened so we can discuss the details.\n" +
-            "We will assist you shortly."
-        });
+    await ticketChannel.send({
+      content:
+        `**Your submission has been accepted.**\n` +
+        `We’ve opened this ticket so we can discuss the details with you and complete the process. We will assist you shortly.`,
+      components: [closeRow]
+    }).catch(console.error);
 
-        await interaction.reply({ content: `Accepted — Ticket created: <#${ticketChannel.id}>`, ephemeral: false });
-        return;
-      }
-
-      if (interaction.customId.startsWith('deny_application_')) {
-        await interaction.reply({
-          content:
-            `🟥 Denied by <@${interaction.user.id}>\n` +
-            `Your submission was not approved.\n` +
-            `If you need clarification, contact staff in support.`,
-          ephemeral: false
-        });
-        return;
-      }
-
-      if (interaction.customId.startsWith('staff_close_')) {
-        const channelId = interaction.customId.replace('staff_close_', '');
-        const channel = interaction.guild?.channels.cache.get(channelId);
-        if (!channel) {
-          await interaction.reply({ content: "Channel not found.", ephemeral: true });
-          return;
-        }
-        await interaction.reply({ content: "Ticket closed. Deleting in 3 seconds...", ephemeral: true });
-        setTimeout(() => channel.delete().catch(() => {}), 3000);
-        return;
-      }
-    }
-
-    if (interaction.isModalSubmit()) {
-      if (interaction.customId === 'service_form') {
-        const contact = interaction.fields.getTextInputValue('contact');
-        const service = interaction.fields.getTextInputValue('service_details');
-        const pricing = interaction.fields.getTextInputValue('pricing') || "None";
-        const portfolio = interaction.fields.getTextInputValue('portfolio') || "None";
-        const extra = interaction.fields.getTextInputValue('extra_info') || "None";
-
-        const appChannel = await interaction.guild?.channels.fetch(APPLICATION_CHANNEL_ID);
-        if (!appChannel || !appChannel.isTextBased()) {
-          await interaction.reply({ content: 'Application channel not found. Contact staff.', ephemeral: true });
-          return;
-        }
-
-        const embed = new EmbedBuilder()
-          .setColor('#2b2d31')
-          .setTitle('📝 New Service Submission')
-          .setDescription(
-            `**User:** <@${interaction.user.id}>\n\n` +
-            `**Contact:** ${contact}\n\n` +
-            `**Service:** ${service}\n\n` +
-            `**Pricing:** ${pricing}\n\n` +
-            `**Portfolio:** ${portfolio}\n\n` +
-            `**Extra Info:** ${extra}`
-          )
-          .setFooter({ text: 'Underclips — Service Submission' });
-
-        const row = new ActionRowBuilder().addComponents(
-          new ButtonBuilder().setCustomId(`accept_application_${interaction.user.id}`).setLabel('Accept').setStyle(ButtonStyle.Success),
-          new ButtonBuilder().setCustomId(`deny_application_${interaction.user.id}`).setLabel('Deny').setStyle(ButtonStyle.Danger)
-        );
-
-        await appChannel.send({ embeds: [embed], components: [row] });
-        await interaction.reply({ content: "✅ Your submission has been sent.", ephemeral: true });
-        return;
-      }
-
-      if (interaction.customId === 'moderator_form') {
-        const basic = interaction.fields.getTextInputValue('basic_info');
-        const timezone = interaction.fields.getTextInputValue('timezone');
-        const activity = interaction.fields.getTextInputValue('activity');
-        const reason = interaction.fields.getTextInputValue('reason');
-        const experience = interaction.fields.getTextInputValue('experience') || "None";
-
-        const appChannel = await interaction.guild?.channels.fetch(APPLICATION_CHANNEL_ID);
-        if (!appChannel || !appChannel.isTextBased()) {
-          await interaction.reply({ content: 'Application channel not found. Contact staff.', ephemeral: true });
-          return;
-        }
-
-        const embed = new EmbedBuilder()
-          .setColor('#2b2d31')
-          .setTitle('🛡️ New Moderator Application')
-          .setDescription(
-            `**User:** <@${interaction.user.id}>\n\n` +
-            `**Basic Info:** ${basic}\n\n` +
-            `**Timezone:** ${timezone}\n\n` +
-            `**Activity:** ${activity}\n\n` +
-            `**Reason:** ${reason}\n\n` +
-            `**Experience:** ${experience}`
-          )
-          .setFooter({ text: 'Underclips — Moderator Application' });
-
-        const row = new ActionRowBuilder().addComponents(
-          new ButtonBuilder().setCustomId(`accept_application_${interaction.user.id}`).setLabel('Accept').setStyle(ButtonStyle.Success),
-          new ButtonBuilder().setCustomId(`deny_application_${interaction.user.id}`).setLabel('Deny').setStyle(ButtonStyle.Danger)
-        );
-
-        await appChannel.send({ embeds: [embed], components: [row] });
-        await interaction.reply({ content: "✅ Your application has been submitted.", ephemeral: true });
-        return;
-      }
-    }
+    // Reply to staff without emoji
+    await interaction.reply({ content: `**Accepted** — Ticket created: <#${ticketChannel.id}>`, ephemeral: false }).catch(console.error);
   } catch (err) {
-    console.error('Interaction handler error:', err);
-    try {
-      if (!interaction.replied && !interaction.deferred) {
-        await interaction.reply({ content: 'An error occurred while processing your interaction.', ephemeral: true });
-      }
-    } catch (replyErr) {
-      console.error('Failed to send error reply:', replyErr);
-    }
+    console.error('Accept application error:', err);
+    await interaction.reply({ content: 'Failed to create application ticket.', ephemeral: true }).catch(() => {});
+  }
+  return;
+}
+// part3.js
+// Message handlers and final login
+
+// Simple ping command
+client.on('messageCreate', (message) => {
+  if (message.author.bot) return;
+  if (message.content === '!ping') {
+    message.reply('🏓 Pong!').catch(console.error);
   }
 });
-// part3.js
-// Token validation and login
 
-const BOT_TOKEN = process.env.TOKEN || process.env.BOT_TOKEN || null;
+// Optional: add other runtime listeners here (reaction handlers, commands, etc.)
 
-if (!BOT_TOKEN || typeof BOT_TOKEN !== 'string' || BOT_TOKEN.trim().length === 0) {
-  console.error('Missing or invalid bot token. Set TOKEN in your environment or .env file.');
-  console.error('Create a .env file with:');
-  console.error('TOKEN=your_bot_token_here');
-  process.exit(1);
-}
-
-client.login(BOT_TOKEN)
+// Login (uses your existing environment variable)
+client.login(process.env.DISCORD_TOKEN)
   .then(() => console.log('Login successful'))
   .catch(err => {
-    console.error('Failed to login. Check token and gateway intents. Error:', err);
-    process.exit(1);
+    console.error('Failed to login. Check DISCORD_TOKEN and bot intents. Error:', err);
   });
+// part4.js (config.js)
+// Put this file next to your main files and require it where needed.
+// Replace the placeholder IDs with your real channel IDs.
+
+module.exports = {
+  SUPPORT_CHANNEL_ID: "1516092800469303437",
+  RULES_CHANNEL_ID: "1516812179410780261",
+  CAMPAIGN_INFO_CHANNEL_ID: "1515782662412046416",
+  CAMPAIGN_RULES_CHANNEL_ID: "1520485646311882945",
+  HOW_TO_CLIP_CHANNEL_ID: "1534171904137625631",
+  WORK_WITH_US_CHANNEL_ID: "1532762065758978190",
+  APPLICATION_CHANNEL_ID: "1534208165443404020"
+};
+// part5-helpers.js
+const { ChannelType } = require('discord.js');
+
+module.exports = {
+  safeFetchTextChannel: async (client, id) => {
+    try {
+      const ch = await client.channels.fetch(id);
+      if (!ch || !ch.isTextBased()) return null;
+      return ch;
+    } catch {
+      return null;
+    }
+  },
+
+  createTicketChannel: async (guild, name, overwrites = []) => {
+    // name trimmed to 90 chars to avoid API errors
+    return guild.channels.create({
+      name: name.slice(0, 90),
+      type: ChannelType.GuildText,
+      permissionOverwrites: overwrites
+    });
+  }
+};
+// part6-commands.js
+// Minimal command registration example (in-memory)
+const commands = new Map();
+
+commands.set('ping', {
+  name: 'ping',
+  description: 'Ping the bot',
+  execute: async (message) => {
+    await message.reply('🏓 Pong!');
+  }
+});
+
+module.exports = {
+  commands,
+  handleMessageCreate: async (message) => {
+    if (message.author.bot) return;
+    const prefix = '!';
+    if (!message.content.startsWith(prefix)) return;
+    const [cmd, ...args] = message.content.slice(prefix.length).trim().split(/\s+/);
+    const command = commands.get(cmd);
+    if (command) {
+      try {
+        await command.execute(message, args);
+      } catch (err) {
+        console.error('Command error:', err);
+      }
+    }
+  }
+};
+// part6-start.js
+// Example main entry that requires parts and starts the client
+const { Client, GatewayIntentBits, Partials } = require('discord.js');
+const config = require('./part5-config');
+const { handleMessageCreate } = require('./part6-commands');
+
+// If you already have client in part1, skip creating a new one and export/import instead
+const client = new Client({
+  intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent],
+  partials: [Partials.Channel]
+});
+
+// require your part1 and part2 files here if they export functions that accept client
+// e.g., require('./part1')(client); require('./part2')(client);
+
+client.on('messageCreate', handleMessageCreate);
+
+client.login(process.env.DISCORD_TOKEN)
+  .then(() => console.log('Login successful'))
+  .catch(err => console.error('Login failed', err));
 
 
+
+  
