@@ -1,3 +1,4 @@
+// part1.js
 const {
   Client,
   GatewayIntentBits,
@@ -9,7 +10,8 @@ const {
   PermissionsBitField,
   ModalBuilder,
   TextInputBuilder,
-  TextInputStyle
+  TextInputStyle,
+  ChannelType
 } = require('discord.js');
 
 const client = new Client({
@@ -22,39 +24,44 @@ const client = new Client({
   partials: [Partials.Channel]
 });
 
-// CHANNEL IDs (replace with your real IDs if different)
+// CHANNEL IDs (replace with your real IDs)
 const SUPPORT_CHANNEL_ID = "1516092800469303437";
 const RULES_CHANNEL_ID = "1516812179410780261";
 const WORK_WITH_US_CHANNEL_ID = "1532762065758978190";
 const APPLICATION_CHANNEL_ID = "1534208165443404020";
+
 client.once('ready', async () => {
   console.log(`Bot online as ${client.user.tag}`);
 
   // RULES EMBED (sends once)
   try {
     const rulesChannel = await client.channels.fetch(RULES_CHANNEL_ID);
-    const rulesMessages = await rulesChannel.messages.fetch({ limit: 20 });
-    const rulesExisting = rulesMessages.find(m => m.author.id === client.user.id && m.embeds.length > 0);
+    if (!rulesChannel || !rulesChannel.isTextBased()) {
+      console.warn('Rules channel not found or not text-based.');
+    } else {
+      const rulesMessages = await rulesChannel.messages.fetch({ limit: 20 });
+      const rulesExisting = rulesMessages.find(m => m.author?.id === client.user.id && m.embeds.length > 0);
 
-    if (!rulesExisting) {
-      const rulesEmbed = new EmbedBuilder()
-        .setColor('#2b2d31')
-        .setTitle('📜 Rules')
-        .setDescription(
-          "**1. Respect Everyone** Be kind and mature.\n" +
-          "**2. No Spam** Don’t flood chats.\n" +
-          "**3. Stay On Topic** Use channels correctly.\n" +
-          "**4. No NSFW** No sexual or disturbing content.\n" +
-          "**5. No Self‑Promo** Unless staff approves.\n" +
-          "**6. Follow Staff** Their decisions are final.\n" +
-          "**7. Keep It Safe** No threats or harassment.\n" +
-          "**8. No Illegal Content** No hacks or scams.\n" +
-          "**9. No Doxing** Never share personal info.\n" +
-          "**10. Discord Guidelines** Follow ToS."
-        )
-        .setFooter({ text: 'Underclips Server Rules' });
+      if (!rulesExisting) {
+        const rulesEmbed = new EmbedBuilder()
+          .setColor('#2b2d31')
+          .setTitle('📜 Rules')
+          .setDescription(
+            "**1. Respect Everyone** Be kind and mature.\n" +
+            "**2. No Spam** Don’t flood chats.\n" +
+            "**3. Stay On Topic** Use channels correctly.\n" +
+            "**4. No NSFW** No sexual or disturbing content.\n" +
+            "**5. No Self‑Promo** Unless staff approves.\n" +
+            "**6. Follow Staff** Their decisions are final.\n" +
+            "**7. Keep It Safe** No threats or harassment.\n" +
+            "**8. No Illegal Content** No hacks or scams.\n" +
+            "**9. No Doxing** Never share personal info.\n" +
+            "**10. Discord Guidelines** Follow ToS."
+          )
+          .setFooter({ text: 'Underclips Server Rules' });
 
-      await rulesChannel.send({ embeds: [rulesEmbed] });
+        await rulesChannel.send({ embeds: [rulesEmbed] });
+      }
     }
   } catch (err) {
     console.error('Failed to send rules embed:', err);
@@ -63,37 +70,40 @@ client.once('ready', async () => {
   // WORK WITH US EMBED (sends once)
   try {
     const workChannel = await client.channels.fetch(WORK_WITH_US_CHANNEL_ID);
-    const workMessages = await workChannel.messages.fetch({ limit: 20 });
-    const workExisting = workMessages.find(m => m.author.id === client.user.id && m.embeds.length > 0);
+    if (!workChannel || !workChannel.isTextBased()) {
+      console.warn('Work channel not found or not text-based.');
+    } else {
+      const workMessages = await workChannel.messages.fetch({ limit: 20 });
+      const workExisting = workMessages.find(m => m.author?.id === client.user.id && m.embeds.length > 0);
 
-    if (!workExisting) {
-      const workEmbed = new EmbedBuilder()
-        .setColor('#2b2d31')
-        .setTitle('📋 Underclips — Submit a Request')
-        .setDescription(
-          "📝 **Service Submission**\nSubmit a service you can provide us or a campaign you want to start.\n\n" +
-          "🛡️ **Moderator**\nApply to be a moderator and help support the community.\n\n" +
-          "———————————————\nClick a button below to begin."
-        )
-        .setFooter({ text: 'Underclips — Applications' });
+      if (!workExisting) {
+        const workEmbed = new EmbedBuilder()
+          .setColor('#2b2d31')
+          .setTitle('📋 Underclips — Submit a Request')
+          .setDescription(
+            "📝 **Service Submission**\nSubmit a service you can provide us or a campaign you want to start.\n\n" +
+            "🛡️ **Moderator**\nApply to be a moderator and help support the community.\n\n" +
+            "———————————————\nClick a button below to begin."
+          )
+          .setFooter({ text: 'Underclips — Applications' });
 
-      const workRow = new ActionRowBuilder().addComponents(
-        new ButtonBuilder().setCustomId('apply_service').setLabel('📝 Service Submission').setStyle(ButtonStyle.Primary),
-        new ButtonBuilder().setCustomId('apply_moderator').setLabel('🛡️ Moderator').setStyle(ButtonStyle.Danger)
-      );
+        const workRow = new ActionRowBuilder().addComponents(
+          new ButtonBuilder().setCustomId('apply_service').setLabel('📝 Service Submission').setStyle(ButtonStyle.Primary),
+          new ButtonBuilder().setCustomId('apply_moderator').setLabel('🛡️ Moderator').setStyle(ButtonStyle.Danger)
+        );
 
-      await workChannel.send({ embeds: [workEmbed], components: [workRow] });
+        await workChannel.send({ embeds: [workEmbed], components: [workRow] });
+      }
     }
   } catch (err) {
     console.error('Failed to send work embed:', err);
   }
 });
+// part2.js
 client.on('interactionCreate', async (interaction) => {
   try {
-    // ---------- BUTTON INTERACTIONS ----------
     if (interaction.isButton()) {
-
-      // SERVICE modal (show immediately)
+      // SERVICE modal (show immediately) - max 5 inputs per modal
       if (interaction.customId === 'apply_service') {
         const modal = new ModalBuilder()
           .setCustomId('service_form')
@@ -129,26 +139,19 @@ client.on('interactionCreate', async (interaction) => {
           .setStyle(TextInputStyle.Paragraph)
           .setRequired(false);
 
-        const questionsInput = new TextInputBuilder()
-          .setCustomId('questions')
-          .setLabel('Questions')
-          .setStyle(TextInputStyle.Paragraph)
-          .setRequired(false);
-
         modal.addComponents(
           new ActionRowBuilder().addComponents(contactInput),
           new ActionRowBuilder().addComponents(serviceInput),
           new ActionRowBuilder().addComponents(pricingInput),
           new ActionRowBuilder().addComponents(portfolioInput),
-          new ActionRowBuilder().addComponents(extraInput),
-          new ActionRowBuilder().addComponents(questionsInput)
+          new ActionRowBuilder().addComponents(extraInput)
         );
 
         await interaction.showModal(modal);
         return;
       }
 
-      // MODERATOR modal (show immediately)
+      // MODERATOR modal (show immediately) - max 5 inputs per modal
       if (interaction.customId === 'apply_moderator') {
         const modal = new ModalBuilder()
           .setCustomId('moderator_form')
@@ -184,19 +187,12 @@ client.on('interactionCreate', async (interaction) => {
           .setStyle(TextInputStyle.Paragraph)
           .setRequired(false);
 
-        const questionsInput = new TextInputBuilder()
-          .setCustomId('questions')
-          .setLabel('Questions (optional)')
-          .setStyle(TextInputStyle.Paragraph)
-          .setRequired(false);
-
         modal.addComponents(
           new ActionRowBuilder().addComponents(basicInput),
           new ActionRowBuilder().addComponents(timezoneInput),
           new ActionRowBuilder().addComponents(activityInput),
           new ActionRowBuilder().addComponents(reasonInput),
-          new ActionRowBuilder().addComponents(experienceInput),
-          new ActionRowBuilder().addComponents(questionsInput)
+          new ActionRowBuilder().addComponents(experienceInput)
         );
 
         await interaction.showModal(modal);
@@ -206,12 +202,28 @@ client.on('interactionCreate', async (interaction) => {
       // ACCEPT application button
       if (interaction.customId.startsWith('accept_application_')) {
         const userId = interaction.customId.replace('accept_application_', '');
-        const ticketChannel = await interaction.guild.channels.create({
+        const guild = interaction.guild;
+        if (!guild) {
+          await interaction.reply({ content: 'Guild not found.', ephemeral: true });
+          return;
+        }
+
+        const ticketChannel = await guild.channels.create({
           name: `application-${userId}`,
-          type: 0,
+          type: ChannelType.GuildText,
           permissionOverwrites: [
-            { id: interaction.guild.roles.everyone, deny: [PermissionsBitField.Flags.ViewChannel] },
-            { id: userId, allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages, PermissionsBitField.Flags.ReadMessageHistory] }
+            {
+              id: guild.roles.everyone.id || guild.id,
+              deny: [PermissionsBitField.Flags.ViewChannel]
+            },
+            {
+              id: userId,
+              allow: [
+                PermissionsBitField.Flags.ViewChannel,
+                PermissionsBitField.Flags.SendMessages,
+                PermissionsBitField.Flags.ReadMessageHistory
+              ]
+            }
           ]
         });
 
@@ -222,7 +234,7 @@ client.on('interactionCreate', async (interaction) => {
             "We will assist you shortly."
         });
 
-        await interaction.reply({ content: `Accepted — Ticket created: ${ticketChannel}`, ephemeral: false });
+        await interaction.reply({ content: `Accepted — Ticket created: <#${ticketChannel.id}>`, ephemeral: false });
         return;
       }
 
@@ -241,7 +253,7 @@ client.on('interactionCreate', async (interaction) => {
       // STAFF CLOSE ticket button (if used)
       if (interaction.customId.startsWith('staff_close_')) {
         const channelId = interaction.customId.replace('staff_close_', '');
-        const channel = interaction.guild.channels.cache.get(channelId);
+        const channel = interaction.guild?.channels.cache.get(channelId);
         if (!channel) {
           await interaction.reply({ content: "Channel not found.", ephemeral: true });
           return;
@@ -251,19 +263,22 @@ client.on('interactionCreate', async (interaction) => {
         return;
       }
     } // end isButton
-    // ---------- MODAL SUBMISSIONS ----------
-    if (interaction.isModalSubmit()) {
 
+    // MODAL SUBMISSIONS
+    if (interaction.isModalSubmit()) {
       // SERVICE SUBMISSION
       if (interaction.customId === 'service_form') {
         const contact = interaction.fields.getTextInputValue('contact');
         const service = interaction.fields.getTextInputValue('service_details');
-        const pricing = interaction.fields.getTextInputValue('pricing');
-        const portfolio = interaction.fields.getTextInputValue('portfolio');
-        const extra = interaction.fields.getTextInputValue('extra_info');
-        const questions = interaction.fields.getTextInputValue('questions');
+        const pricing = interaction.fields.getTextInputValue('pricing') || "None";
+        const portfolio = interaction.fields.getTextInputValue('portfolio') || "None";
+        const extra = interaction.fields.getTextInputValue('extra_info') || "None";
 
-        const appChannel = await interaction.guild.channels.fetch(APPLICATION_CHANNEL_ID);
+        const appChannel = await interaction.guild?.channels.fetch(APPLICATION_CHANNEL_ID);
+        if (!appChannel || !appChannel.isTextBased()) {
+          await interaction.reply({ content: 'Application channel not found. Contact staff.', ephemeral: true });
+          return;
+        }
 
         const embed = new EmbedBuilder()
           .setColor('#2b2d31')
@@ -272,10 +287,9 @@ client.on('interactionCreate', async (interaction) => {
             `**User:** <@${interaction.user.id}>\n\n` +
             `**Contact:** ${contact}\n\n` +
             `**Service:** ${service}\n\n` +
-            `**Pricing:** ${pricing || "None"}\n\n` +
-            `**Portfolio:** ${portfolio || "None"}\n\n` +
-            `**Extra Info:** ${extra || "None"}\n\n` +
-            `**Questions:** ${questions || "None"}`
+            `**Pricing:** ${pricing}\n\n` +
+            `**Portfolio:** ${portfolio}\n\n` +
+            `**Extra Info:** ${extra}`
           )
           .setFooter({ text: 'Underclips — Service Submission' });
 
@@ -288,16 +302,20 @@ client.on('interactionCreate', async (interaction) => {
         await interaction.reply({ content: "✅ Your submission has been sent.", ephemeral: true });
         return;
       }
+
       // MODERATOR SUBMISSION
       if (interaction.customId === 'moderator_form') {
         const basic = interaction.fields.getTextInputValue('basic_info');
         const timezone = interaction.fields.getTextInputValue('timezone');
         const activity = interaction.fields.getTextInputValue('activity');
         const reason = interaction.fields.getTextInputValue('reason');
-        const experience = interaction.fields.getTextInputValue('experience');
-        const questions = interaction.fields.getTextInputValue('questions');
+        const experience = interaction.fields.getTextInputValue('experience') || "None";
 
-        const appChannel = await interaction.guild.channels.fetch(APPLICATION_CHANNEL_ID);
+        const appChannel = await interaction.guild?.channels.fetch(APPLICATION_CHANNEL_ID);
+        if (!appChannel || !appChannel.isTextBased()) {
+          await interaction.reply({ content: 'Application channel not found. Contact staff.', ephemeral: true });
+          return;
+        }
 
         const embed = new EmbedBuilder()
           .setColor('#2b2d31')
@@ -308,8 +326,7 @@ client.on('interactionCreate', async (interaction) => {
             `**Timezone:** ${timezone}\n\n` +
             `**Activity:** ${activity}\n\n` +
             `**Reason:** ${reason}\n\n` +
-            `**Experience:** ${experience || "None"}\n\n` +
-            `**Questions:** ${questions || "None"}`
+            `**Experience:** ${experience}`
           )
           .setFooter({ text: 'Underclips — Moderator Application' });
 
@@ -325,7 +342,6 @@ client.on('interactionCreate', async (interaction) => {
     } // end isModalSubmit
   } catch (err) {
     console.error('Interaction handler error:', err);
-    // If interaction not yet replied, send an ephemeral error message
     try {
       if (!interaction.replied && !interaction.deferred) {
         await interaction.reply({ content: 'An error occurred while processing your interaction.', ephemeral: true });
@@ -334,8 +350,14 @@ client.on('interactionCreate', async (interaction) => {
       console.error('Failed to send error reply:', replyErr);
     }
   }
-}); // end interactionCreate
+});
+// part3.js
 // Start the bot
+if (!process.env.TOKEN) {
+  console.error('Missing TOKEN in environment variables.');
+  process.exit(1);
+}
+
 client.login(process.env.TOKEN).catch(err => {
   console.error('Failed to login:', err);
 });
