@@ -543,9 +543,17 @@ client.on('interactionCreate', async (interaction) => {
           `**Pricing:** ${pricing || "None"}\n\n` +
           `**Portfolio:** ${portfolio || "None"}\n\n` +
           `**Extra Info:** ${extra_info || "None"}\n\n` +
-          `**Questions:** ${questions || "None"}
+          `**Questions:** ${questions || "None"}`
+        )
+        .setFooter({ text: 'Underclips — Service Submission' });
 
-
+      const row = new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+          .setCustomId(`accept_application_${interaction.user.id}`)
+          .setLabel('Accept')
+          .setStyle(ButtonStyle.Success),
+        new ButtonBuilder()
+          .setCustomId(`deny
 
 
 
