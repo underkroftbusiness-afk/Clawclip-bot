@@ -1,9 +1,9 @@
-const { 
-  Client, 
-  GatewayIntentBits, 
-  Partials, 
-  ActionRowBuilder, 
-  ButtonBuilder, 
+const {
+  Client,
+  GatewayIntentBits,
+  Partials,
+  ActionRowBuilder,
+  ButtonBuilder,
   ButtonStyle,
   EmbedBuilder,
   PermissionsBitField
@@ -25,10 +25,9 @@ const RULES_CHANNEL_ID = "1516812179410780261";
 const CAMPAIGN_INFO_CHANNEL_ID = "1515782662412046416";
 const CAMPAIGN_RULES_CHANNEL_ID = "1520485646311882945";
 const HOW_TO_CLIP_CHANNEL_ID = "1534171904137625631";
+const PARTNER_WITH_US_CHANNEL_ID = "1532762065758978190";
+const STAFF_CHANNEL_ID = "1534208165443404020";
 
-// 🧩 NEW SYSTEM CHANNEL
-const PARTNER_WITH_US_CHANNEL_ID = "1532762065758978190"; 
-const STAFF_CHANNEL_ID = "1534208165443404020";  
 client.once('ready', async () => {
   console.log(`🔑 Bot is online as ${client.user.tag}`);
 
@@ -55,6 +54,7 @@ client.once('ready', async () => {
 
     await supportChannel.send({ embeds: [embed], components: [row] });
   }
+
   // 📜 RULES MESSAGE
   const rulesChannel = await client.channels.fetch(RULES_CHANNEL_ID);
   const rulesMessages = await rulesChannel.messages.fetch({ limit: 20 });
@@ -82,6 +82,7 @@ client.once('ready', async () => {
 
     await rulesChannel.send({ embeds: [rulesEmbed] });
   }
+
   // 💰 CAMPAIGN INFO
   const campaignInfoChannel = await client.channels.fetch(CAMPAIGN_INFO_CHANNEL_ID);
   const campaignMessages = await campaignInfoChannel.messages.fetch({ limit: 20 });
@@ -105,6 +106,7 @@ client.once('ready', async () => {
 
     await campaignInfoChannel.send({ embeds: [payoutEmbed] });
   }
+
   // 📋 CAMPAIGN RULES
   const campaignRulesChannel = await client.channels.fetch(CAMPAIGN_RULES_CHANNEL_ID);
   const campaignRulesMessages = await campaignRulesChannel.messages.fetch({ limit: 20 });
@@ -130,7 +132,8 @@ client.once('ready', async () => {
 
     await campaignRulesChannel.send({ embeds: [campaignRulesEmbed] });
   }
-  // 📘 ORIGINAL CLIPPING-TIPS — RESTORED EXACTLY
+
+  // 📘 CLIPPING TIPS — FIXED
   const clipChannel = await client.channels.fetch(HOW_TO_CLIP_CHANNEL_ID);
   const clipMessages = await clipChannel.messages.fetch({ limit: 20 });
   const clipExisting = clipMessages.find(
@@ -140,11 +143,18 @@ client.once('ready', async () => {
   if (!clipExisting) {
     const clipEmbed = new EmbedBuilder()
       .setColor('#2b2d31')
-      .setTitle('📘Clipping-tips')
+      .setTitle('📘 Clipping Tips')
       .setDescription(
         "**The Hook**\nYour first 3 seconds decide if viewers stay. Strong openings increase watch time and push your video further. Create quick curiosity or emotion.\n\n" +
         "**Clip Selection & Length**\nChoose moments that feel viral or instantly grab attention. Short clips perform best. IG: ~40s • TikTok: ~30s • Shorts: 15–20s.\n\n" +
-        "**Editing**\nYou can use CapCut or OpusClip to edit your clips. Add clear, bold captions to keep viewers focused, and choose trending
+        "**Editing**\nYou can use CapCut or OpusClip to edit your clips. Add clear, bold captions to keep viewers focused, and choose trending audio to help the algorithm push your content further.\n\n" +
+        "**Posting Strategy**\nPost consistently throughout the day. Use hashtags that match your niche."
+      )
+      .setFooter({ text: 'Underclips Clipping Guide' });
+
+    await clipChannel.send({ embeds: [clipEmbed] });
+  }
+
   // 📋 SUBMIT A REQUEST — NEW SYSTEM
   const workChannel = await client.channels.fetch(PARTNER_WITH_US_CHANNEL_ID);
   const workMessages = await workChannel.messages.fetch({ limit: 20 });
@@ -177,15 +187,21 @@ client.once('ready', async () => {
     );
 
     await workChannel.send({ embeds: [workEmbed], components: [workRow] });
+  }
+});
+
+// 👋 Auto DM
 client.on('guildMemberAdd', async (member) => {
   try {
     await member.send(
-      `👋 Welcome to Underclips.\n\nUnderclips is built for clippers who want to grow, improve, and earn from their content.`
+      `👋 Welcome to Underclips.\n\nUnderclips is built for clippers who want to grow, improve, and earn from their            
     );
   } catch {
     console.log('Could not send DM.');
   }
 });
+
+// 🎟️ Ticket System
 client.on('interactionCreate', async (interaction) => {
   if (!interaction.isButton()) return;
 
@@ -249,10 +265,11 @@ client.on('interactionCreate', async (interaction) => {
     await interaction.channel.delete();
   }
 });
+
+// 📝 Application Forms
 client.on('interactionCreate', async (interaction) => {
   if (!interaction.isButton()) return;
 
-  // 📝 SERVICE SUBMISSION FORM
   if (interaction.customId === 'apply_service') {
     await interaction.showModal({
       customId: 'service_form',
@@ -286,7 +303,6 @@ client.on('interactionCreate', async (interaction) => {
     });
   }
 
-  // 🛡️ MODERATOR APPLICATION FORM
   if (interaction.customId === 'apply_moderator') {
     await interaction.showModal({
       customId: 'moderator_form',
@@ -320,10 +336,11 @@ client.on('interactionCreate', async (interaction) => {
     });
   }
 });
+
+// 🛡️ Modal Responses
 client.on('interactionCreate', async (interaction) => {
   if (!interaction.isModalSubmit()) return;
 
-  // 📝 SERVICE SUBMISSION RESPONSE
   if (interaction.customId === 'service_form') {
     const name = interaction.fields.getTextInputValue('service_name');
     const details = interaction.fields.getTextInputValue('service_details');
@@ -331,10 +348,7 @@ client.on('interactionCreate', async (interaction) => {
     const embed = new EmbedBuilder()
       .setColor('#2b2d31')
       .setTitle('📝 New Service Submission')
-      .setDescription(
-        `**Name:** ${name}\n\n` +
-        `**Service Details:**\n${details}`
-      )
+      .setDescription(`**Name:** ${name}\n\n**Service Details:**\n${details}`)
       .setFooter({ text: 'Underclips — Service Submission' });
 
     const staffChannel = await interaction.guild.channels.fetch(STAFF_CHANNEL_ID);
@@ -346,7 +360,6 @@ client.on('interactionCreate', async (interaction) => {
     });
   }
 
-  // 🛡️ MODERATOR APPLICATION RESPONSE
   if (interaction.customId === 'moderator_form') {
     const name = interaction.fields.getTextInputValue('mod_name');
     const reason = interaction.fields.getTextInputValue('mod_reason');
@@ -354,10 +367,7 @@ client.on('interactionCreate', async (interaction) => {
     const embed = new EmbedBuilder()
       .setColor('#2b2d31')
       .setTitle('🛡️ New Moderator Application')
-      .setDescription(
-        `**Name:** ${name}\n\n` +
-        `**Reason:**\n${reason}`
-      )
+      .setDescription(`**Name:** ${name}\n\n**Reason:**\n${reason}`)
       .setFooter({ text: 'Underclips — Moderator Application' });
 
     const staffChannel = await interaction.guild.channels.fetch(STAFF_CHANNEL_ID);
@@ -369,12 +379,14 @@ client.on('interactionCreate', async (interaction) => {
     });
   }
 });
+
+// 🏓 Ping Command
 client.on('messageCreate', (message) => {
   if (message.content === '!ping') {
     message.reply('🏓 Pong!');
   }
 });
+
+// 🔑 Login
 client.login(process.env.DISCORD_TOKEN);
 
-
-  
