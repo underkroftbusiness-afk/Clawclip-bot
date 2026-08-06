@@ -58,16 +58,16 @@ client.once('ready', async () => {
       .setColor('#2b2d31')
       .setTitle('📜 Rules')
       .setDescription(
-        "**1. Respect Everyone** Be kind and mature. No hate, drama, or toxic behavior.\n" +
-        "**2. No Spam** Don’t flood chats with messages, caps, or pings.\n" +
-        "**3. Stay On Topic** Use channels for their purpose.\n" +
-        "**4. No NSFW** No sexual, violent, or disturbing content.\n" +
-        "**5. No Self‑Promo** Don’t advertise socials or servers unless staff approves.\n" +
-        "**6. Follow Staff** Admins and mods make final decisions. Respect their instructions.\n" +
-        "**7. Keep It Safe** No threats, harassment, or sharing private info.\n" +
-        "**8. No Illegal Content** No hacks, cheats, scams, or leaked files.\n" +
-        "**9. No Doxing** Never share personal information.\n" +
-        "**10. Discord Guidelines** Follow Discord’s Terms of Service and Community Guidelines."
+        "**1. Respect Everyone** Be kind and mature.\n" +
+        "**2. No Spam** Don’t flood chats.\n" +
+        "**3. Stay On Topic** Use channels correctly.\n" +
+        "**4. No NSFW** No sexual or disturbing content.\n" +
+        "**5. No Self‑Promo** Unless staff approves.\n" +
+        "**6. Follow Staff** Their decisions are final.\n" +
+        "**7. Keep It Safe** No threats or harassment.\n" +
+        "**8. No Illegal Content** No hacks or scams.\n" +
+        "**9. No Doxing** Never share personal info.\n" +
+        "**10. Discord Guidelines** Follow ToS."
       )
       .setFooter({ text: 'Underclips Server Rules' });
 
@@ -104,20 +104,19 @@ client.once('ready', async () => {
       .setColor('#2b2d31')
       .setTitle('📋 Campaign Rules')
       .setDescription(
-        "**No Botting**\n\nAll engagement must be real.\n\n" +
-        "**Audience Must Match**\n\nEnglish campaigns require 50% English audience.\n\n" +
-        "**Follow Requirements**\n\nPosts must follow all rules.\n\n" +
-        "**Do Not Hide Metrics**\n\nLikes, views, comments must stay visible.\n\n" +
-        "**No Low‑Effort Posts**\n\nPosts must be real and high‑quality.\n\n" +
-        "**No Duplicate Posts**\n\nDo not upload the same post twice.\n\n" +
-        "**Posts Must Stay Public**\n\nUntil payout is sent.\n\n" +
+        "**No Botting** All engagement must be real.\n\n" +
+        "**Audience Must Match** English campaigns require 50% English audience.\n\n" +
+        "**Follow Requirements** Posts must follow all rules.\n\n" +
+        "**Do Not Hide Metrics** Likes, views, comments must stay visible.\n\n" +
+        "**No Low‑Effort Posts** Must be high‑quality.\n\n" +
+        "**No Duplicate Posts** Do not upload twice.\n\n" +
+        "**Posts Must Stay Public** Until payout.\n\n" +
         "**Staff Decisions Are Final**"
       )
       .setFooter({ text: 'Underclips Campaign Rules' });
 
     await campaignRulesChannel.send({ embeds: [campaignRulesEmbed] });
   }
-
   const partnerChannel = await client.channels.fetch(PARTNER_WITH_US_CHANNEL_ID);
   const partnerMessages = await partnerChannel.messages.fetch({ limit: 20 });
   const partnerExisting = partnerMessages.find(m => m.author.id === client.user.id && m.embeds.length > 0);
@@ -125,11 +124,11 @@ client.once('ready', async () => {
   if (!partnerExisting) {
     const partnerEmbed = new EmbedBuilder()
       .setColor('#2b2d31')
-      .setTitle('🤝 Underclips — Partner With Us')
+      .setTitle('📋 Underclips — Submit a Request')
       .setDescription(
         "**📝 Service Submission**\n" +
         "Submit a service you can provide or a project you want to collaborate on.\n\n" +
-        "**🛡️ Moderator**\n" +
+        "**🛡️ Moderator Application**\n" +
         "Apply to be a moderator and help support the community.\n\n" +
         "———————————————\nClick a button below to begin."
       )
@@ -138,11 +137,11 @@ client.once('ready', async () => {
     const partnerRow = new ActionRowBuilder().addComponents(
       new ButtonBuilder()
         .setCustomId('apply_service')
-        .setLabel('Service Submission')
+        .setLabel('📝 Service Submission')
         .setStyle(ButtonStyle.Primary),
       new ButtonBuilder()
         .setCustomId('apply_moderator')
-        .setLabel('Moderator')
+        .setLabel('🛡️ Moderator')
         .setStyle(ButtonStyle.Danger)
     );
 
@@ -151,9 +150,7 @@ client.once('ready', async () => {
 });
 client.on('guildMemberAdd', async (member) => {
   try {
-    await member.send(
-      `👋 Welcome to Underclips — The Clipping Server That Helps You!`
-    );
+    await member.send("👋 Welcome to Underclips — The Clipping Server That Helps You!");
   } catch {
     console.log('Could not send DM.');
   }
@@ -239,12 +236,11 @@ client.on('interactionCreate', async (interaction) => {
     setTimeout(() => channel.delete().catch(() => {}), 3000);
   }
 });
+
 client.on('messageCreate', (message) => {
   if (message.content === '!ping') message.reply('Pong!');
 });
 client.login(process.env.DISCORD_TOKEN);
-
-
 
 
 
