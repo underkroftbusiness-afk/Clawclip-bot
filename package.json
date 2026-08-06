@@ -1,15 +1,12 @@
 {
-  "name": "Underclips",
+  "name": "underclips-bot",
   "version": "1.0.0",
-  "description": "Discord bot voor ClawClip",
+  "description": "Discord bot for Underclips server",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
   },
   "dependencies": {
-    "discord.js": "^14.14.1"
-  },
-  "engines": {
-    "node": "20.x"
+    "discord.js": "^14.15.3"
   }
 }
