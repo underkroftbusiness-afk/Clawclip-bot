@@ -6,7 +6,10 @@ const {
   ButtonBuilder, 
   ButtonStyle,
   EmbedBuilder,
-  PermissionsBitField
+  PermissionsBitField,
+  ModalBuilder,
+  TextInputBuilder,
+  TextInputStyle
 } = require('discord.js');
 
 const client = new Client({
@@ -23,7 +26,7 @@ const SUPPORT_CHANNEL_ID = "1516092800469303437";
 const RULES_CHANNEL_ID = "1516812179410780261";
 const CAMPAIGN_INFO_CHANNEL_ID = "1515782662412046416";
 const CAMPAIGN_RULES_CHANNEL_ID = "1520485646311882945";
-const PARTNER_WITH_US_CHANNEL_ID = "1532762065758978190";
+const PARTNER_WITH_US_CHANNEL_ID = "PUT_YOUR_CHANNEL_ID_HERE";
 
 client.once('ready', async () => {
   console.log(`Bot is online as ${client.user.tag}`);
@@ -148,19 +151,40 @@ client.once('ready', async () => {
     await partnerChannel.send({ embeds: [partnerEmbed], components: [partnerRow] });
   }
 });
-client.on('guildMemberAdd', async (member) => {
-  try {
-    await member.send("👋 Welcome to Underclips — The Clipping Server That Helps You!");
-  } catch {
-    console.log('Could not send DM.');
-  }
-});
-
 client.on('interactionCreate', async (interaction) => {
-  if (!interaction.isButton()) return;
+  if (interaction.isButton()) {
 
-  if (interaction.customId === 'create_ticket') {
-    try {
+    if (interaction.customId === 'apply_service') {
+      const modal = new ModalBuilder()
+        .setCustomId('service_modal')
+        .setTitle('📝 Service Submission');
+
+      const input = new TextInputBuilder()
+        .setCustomId('service_details')
+        .setLabel('Describe your service or project')
+        .setStyle(TextInputStyle.Paragraph)
+        .setRequired(true);
+
+      modal.addComponents(new ActionRowBuilder().addComponents(input));
+      return interaction.showModal(modal);
+    }
+
+    if (interaction.customId === 'apply_moderator') {
+      const modal = new ModalBuilder()
+        .setCustomId('moderator_modal')
+        .setTitle('🛡️ Moderator Application');
+
+      const input = new TextInputBuilder()
+        .setCustomId('moderator_reason')
+        .setLabel('Why do you want to be a moderator?')
+        .setStyle(TextInputStyle.Paragraph)
+        .setRequired(true);
+
+      modal.addComponents(new ActionRowBuilder().addComponents(input));
+      return interaction.showModal(modal);
+    }
+
+    if (interaction.customId === 'create_ticket') {
       await interaction.deferReply({ ephemeral: true });
 
       const ticketChannel = await interaction.guild.channels.create({
@@ -170,10 +194,7 @@ client.on('interactionCreate', async (interaction) => {
         permissionOverwrites: [
           {
             id: interaction.guild.roles.everyone,
-            deny: [
-              PermissionsBitField.Flags.ViewChannel,
-              PermissionsBitField.Flags.SendMessages
-            ]
+            deny: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages]
           },
           {
             id: interaction.user.id,
@@ -210,36 +231,40 @@ client.on('interactionCreate', async (interaction) => {
 
       await ticketChannel.send({ embeds: [ticketEmbed], components: [closeRow] });
 
-      await interaction.editReply({
+      return interaction.editReply({
         content: `✅ Your ticket has been created: ${ticketChannel}`,
         ephemeral: true
       });
+    }
 
-    } catch (err) {
-      console.error(err);
-      await interaction.editReply({
-        content: '⚠️ Something went wrong while creating your ticket.',
-        ephemeral: true
-      });
+    if (interaction.customId === 'close_ticket') {
+      const channel = interaction.channel;
+      const isOwner = channel.name.includes(interaction.user.username);
+
+      if (!isOwner) {
+        return interaction.reply({ content: "Only the ticket owner can close this.", ephemeral: true });
+      }
+
+      await interaction.reply({ content: "Ticket closed. Deleting in 3 seconds...", ephemeral: true });
+      return setTimeout(() => channel.delete().catch(() => {}), 3000);
     }
   }
 
-  if (interaction.customId === 'close_ticket') {
-    const channel = interaction.channel;
-    const isOwner = channel.name.includes(interaction.user.username);
-
-    if (!isOwner) {
-      return interaction.reply({ content: "Only the ticket owner can close this.", ephemeral: true });
+  if (interaction.isModalSubmit()) {
+    if (interaction.customId === 'service_modal') {
+      const details = interaction.fields.getTextInputValue('service_details');
+      return interaction.reply({ content: `✅ Service submission received:\n> ${details}`, ephemeral: true });
     }
 
-    await interaction.reply({ content: "Ticket closed. Deleting in 3 seconds...", ephemeral: true });
-    setTimeout(() => channel.delete().catch(() => {}), 3000);
+    if (interaction.customId === 'moderator_modal') {
+      const reason = interaction.fields.getTextInputValue('moderator_reason');
+      return interaction.reply({ content: `✅ Moderator application received:\n> ${reason}`, ephemeral: true });
+    }
   }
-});
-
 client.on('messageCreate', (message) => {
   if (message.content === '!ping') message.reply('Pong!');
 });
+
 client.login(process.env.DISCORD_TOKEN);
 
 
