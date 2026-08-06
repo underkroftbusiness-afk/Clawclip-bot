@@ -123,7 +123,7 @@ client.on('interactionCreate', async (interaction) => {
       if (interaction.customId === 'apply_moderator') {
         const modal = new ModalBuilder()
           .setCustomId('moderator_modal')
-          .setTitle('🛡️ Moderator Application');
+          .setTitle('Do you have any questions for us?');
 
         const modExperience = new TextInputBuilder()
           .setCustomId('moderator_experience')
