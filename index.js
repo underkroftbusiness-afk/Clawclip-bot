@@ -1,5 +1,5 @@
 const { 
-  Client, 
+  Client,
   GatewayIntentBits, 
   Partials, 
   ActionRowBuilder, 
