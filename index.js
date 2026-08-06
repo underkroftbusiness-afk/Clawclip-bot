@@ -19,126 +19,19 @@ const client = new Client({
   partials: [Partials.Channel]
 });
 
+// === CONFIGURE THESE ===
 const SUPPORT_CHANNEL_ID = "1516092800469303437";
 const RULES_CHANNEL_ID = "1516812179410780261";
 const CAMPAIGN_INFO_CHANNEL_ID = "1515782662412046416";
 const CAMPAIGN_RULES_CHANNEL_ID = "1520485646311882945";
 const PARTNER_WITH_US_CHANNEL_ID = "1532762065758978190";
+const APPLICATIONS_CHANNEL_ID = "1534207951995408515";
+const TICKET_CATEGORY_ID = null; // optional: set a category ID for tickets or leave null
+// =======================
 
 client.once('ready', async () => {
   console.log(`Bot is online as ${client.user.tag}`);
 
-  // Support embed
-  try {
-    const supportChannel = await client.channels.fetch(SUPPORT_CHANNEL_ID);
-    const supportMessages = await supportChannel.messages.fetch({ limit: 20 });
-    const supportExisting = supportMessages.find(m => m.author.id === client.user.id && m.embeds.length > 0);
-
-    if (!supportExisting) {
-      const embed = new EmbedBuilder()
-        .setColor('#2b2d31')
-        .setTitle('Need help?')
-        .setDescription('Click the button below to open a support ticket.')
-        .setFooter({ text: 'Underclips Support System' });
-
-      const row = new ActionRowBuilder().addComponents(
-        new ButtonBuilder()
-          .setCustomId('create_ticket')
-          .setLabel('🎟️ Open Support Ticket')
-          .setStyle(ButtonStyle.Primary)
-      );
-
-      await supportChannel.send({ embeds: [embed], components: [row] });
-    }
-  } catch (err) {
-    console.error('Support channel error:', err);
-  }
-
-  // Rules embed
-  try {
-    const rulesChannel = await client.channels.fetch(RULES_CHANNEL_ID);
-    const rulesMessages = await rulesChannel.messages.fetch({ limit: 20 });
-    const rulesExisting = rulesMessages.find(m => m.author.id === client.user.id && m.embeds.length > 0);
-
-    if (!rulesExisting) {
-      const rulesEmbed = new EmbedBuilder()
-        .setColor('#2b2d31')
-        .setTitle('📜 Rules')
-        .setDescription(
-          "**1. Respect Everyone** Be kind and mature.\n" +
-          "**2. No Spam** Don’t flood chats.\n" +
-          "**3. Stay On Topic** Use channels correctly.\n" +
-          "**4. No NSFW** No sexual or disturbing content.\n" +
-          "**5. No Self‑Promo** Unless staff approves.\n" +
-          "**6. Follow Staff** Their decisions are final.\n" +
-          "**7. Keep It Safe** No threats or harassment.\n" +
-          "**8. No Illegal Content** No hacks or scams.\n" +
-          "**9. No Doxing** Never share personal info.\n" +
-          "**10. Discord Guidelines** Follow ToS."
-        )
-        .setFooter({ text: 'Underclips Server Rules' });
-
-      await rulesChannel.send({ embeds: [rulesEmbed] });
-    }
-  } catch (err) {
-    console.error('Rules channel error:', err);
-  }
-
-  // Campaign info embed
-  try {
-    const campaignInfoChannel = await client.channels.fetch(CAMPAIGN_INFO_CHANNEL_ID);
-    const campaignMessages = await campaignInfoChannel.messages.fetch({ limit: 20 });
-    const campaignExisting = campaignMessages.find(m => m.author.id === client.user.id && m.embeds.length > 0);
-
-    if (!campaignExisting) {
-      const payoutEmbed = new EmbedBuilder()
-        .setColor('#2b2d31')
-        .setTitle('💰 Payout Information')
-        .setDescription(
-          "**Payrate Based System**\n\nYou earn a fixed amount per views.\n\n" +
-          "**Pot Style System**\n\nYou earn based on your share of total campaign views.\n\n" +
-          "**Minimum Views**\n\nA post must reach at least 1,000 views.\n\n" +
-          "**Payout Timelines**\n\nPayments are sent after campaign review.\n\n" +
-          "**Payment Method**\n\nChosen by the sponsor.\n\n" +
-          "**Payment Details**\n\nYour payout goes to the saved payment info."
-        )
-        .setFooter({ text: 'Underclips Campaign Info' });
-
-      await campaignInfoChannel.send({ embeds: [payoutEmbed] });
-    }
-  } catch (err) {
-    console.error('Campaign info channel error:', err);
-  }
-
-  // Campaign rules embed
-  try {
-    const campaignRulesChannel = await client.channels.fetch(CAMPAIGN_RULES_CHANNEL_ID);
-    const campaignRulesMessages = await campaignRulesChannel.messages.fetch({ limit: 20 });
-    const campaignRulesExisting = campaignRulesMessages.find(m => m.author.id === client.user.id && m.embeds.length > 0);
-
-    if (!campaignRulesExisting) {
-      const campaignRulesEmbed = new EmbedBuilder()
-        .setColor('#2b2d31')
-        .setTitle('📋 Campaign Rules')
-        .setDescription(
-          "**No Botting** All engagement must be real.\n\n" +
-          "**Audience Must Match** English campaigns require 50% English audience.\n\n" +
-          "**Follow Requirements** Posts must follow all rules.\n\n" +
-          "**Do Not Hide Metrics** Likes, views, comments must stay visible.\n\n" +
-          "**No Low‑Effort Posts** Must be high‑quality.\n\n" +
-          "**No Duplicate Posts** Do not upload twice.\n\n" +
-          "**Posts Must Stay Public** Until payout.\n\n" +
-          "**Staff Decisions Are Final**"
-        )
-        .setFooter({ text: 'Underclips Campaign Rules' });
-
-      await campaignRulesChannel.send({ embeds: [campaignRulesEmbed] });
-    }
-  } catch (err) {
-    console.error('Campaign rules channel error:', err);
-  }
-
-  // Partner With Us embed + buttons
   try {
     const partnerChannel = await client.channels.fetch(PARTNER_WITH_US_CHANNEL_ID);
     const partnerMessages = await partnerChannel.messages.fetch({ limit: 20 });
@@ -171,9 +64,13 @@ client.once('ready', async () => {
       await partnerChannel.send({ embeds: [partnerEmbed], components: [partnerRow] });
     }
   } catch (err) {
-    console.error('Partner channel error:', err);
+    console.error('Partner embed error:', err);
   }
+
+  // Optional: other ready-time embeds (support, rules, campaign) can be added here if needed
 });
+const { ModalBuilder, TextInputBuilder, TextInputStyle } = require('discord.js');
+
 client.on('guildMemberAdd', async (member) => {
   try {
     await member.send("👋 Welcome to Underclips — The Clipping Server That Helps You!");
@@ -184,85 +81,277 @@ client.on('guildMemberAdd', async (member) => {
 
 client.on('interactionCreate', async (interaction) => {
   try {
-    if (!interaction.isButton()) return;
+    // BUTTONS: open modals or handle accept/deny/close
+    if (interaction.isButton()) {
+      // Open Service Submission modal
+      if (interaction.customId === 'apply_service') {
+        const modal = new ModalBuilder()
+          .setCustomId('service_modal')
+          .setTitle('📝 Service Submission');
 
-    if (interaction.customId === 'apply_service') {
-      return interaction.reply({
-        content: '📝 Your service submission request has been received. A staff member will review it soon.',
-        ephemeral: true
-      });
-    }
+        const serviceTitle = new TextInputBuilder()
+          .setCustomId('service_title')
+          .setLabel('Service Title')
+          .setStyle(TextInputStyle.Short)
+          .setPlaceholder('Short title for your service')
+          .setRequired(true);
 
-    if (interaction.customId === 'apply_moderator') {
-      return interaction.reply({
-        content: '🛡️ Your moderator application request has been received. A staff member will review it soon.',
-        ephemeral: true
-      });
-    }
+        const serviceDescription = new TextInputBuilder()
+          .setCustomId('service_description')
+          .setLabel('Describe your service or project')
+          .setStyle(TextInputStyle.Paragraph)
+          .setPlaceholder('Explain what you offer, pricing, examples, links...')
+          .setRequired(true);
 
-    if (interaction.customId === 'create_ticket') {
-      await interaction.deferReply({ ephemeral: true });
+        const serviceExperience = new TextInputBuilder()
+          .setCustomId('service_experience')
+          .setLabel('Relevant experience / portfolio links')
+          .setStyle(TextInputStyle.Paragraph)
+          .setPlaceholder('Years of experience, links to work, socials')
+          .setRequired(false);
 
-      const ticketChannel = await interaction.guild.channels.create({
-        name: `ticket-${interaction.user.username}`,
-        type: 0,
-        topic: `Support ticket for ${interaction.user.tag}`,
-        permissionOverwrites: [
-          {
-            id: interaction.guild.roles.everyone,
-            deny: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages]
-          },
-          {
-            id: interaction.user.id,
-            allow: [
-              PermissionsBitField.Flags.ViewChannel,
-              PermissionsBitField.Flags.SendMessages,
-              PermissionsBitField.Flags.ReadMessageHistory
-            ]
-          },
-          {
-            id: client.user.id,
-            allow: [
-              PermissionsBitField.Flags.ViewChannel,
-              PermissionsBitField.Flags.SendMessages,
-              PermissionsBitField.Flags.ManageChannels,
-              PermissionsBitField.Flags.EmbedLinks
-            ]
-          }
-        ]
-      });
+        modal.addComponents(
+          new ActionRowBuilder().addComponents(serviceTitle),
+          new ActionRowBuilder().addComponents(serviceDescription),
+          new ActionRowBuilder().addComponents(serviceExperience)
+        );
 
-      const ticketEmbed = new EmbedBuilder()
-        .setColor('#2b2d31')
-        .setTitle('🎫 Ticket Created')
-        .setDescription(`Welcome <@${interaction.user.id}>! Someone will help you shortly.`)
-        .setFooter({ text: 'Underclips Support' });
-
-      const closeRow = new ActionRowBuilder().addComponents(
-        new ButtonBuilder()
-          .setCustomId('close_ticket')
-          .setLabel('🔒 Close Ticket')
-          .setStyle(ButtonStyle.Danger)
-      );
-
-      await ticketChannel.send({ embeds: [ticketEmbed], components: [closeRow] });
-
-      return interaction.editReply({
-        content: `✅ Your ticket has been created: ${ticketChannel}`,
-        ephemeral: true
-      });
-    }
-
-    if (interaction.customId === 'close_ticket') {
-      const channel = interaction.channel;
-      const isOwner = channel.name.includes(interaction.user.username);
-
-      if (!isOwner) {
-        return interaction.reply({ content: "Only the ticket owner can close this.", ephemeral: true });
+        return interaction.showModal(modal);
       }
 
-      await interaction.reply({ content: "Ticket closed. Deleting in 3 seconds...", ephemeral: true });
-      setTimeout(() => channel.delete().catch(() => {}), 3000);
+      // Open Moderator Application modal
+      if (interaction.customId === 'apply_moderator') {
+        const modal = new ModalBuilder()
+          .setCustomId('moderator_modal')
+          .setTitle('🛡️ Moderator Application');
+
+        const modExperience = new TextInputBuilder()
+          .setCustomId('moderator_experience')
+          .setLabel('Moderation experience')
+          .setStyle(TextInputStyle.Paragraph)
+          .setPlaceholder('Describe previous mod experience, tools used, hours available')
+          .setRequired(true);
+
+        const modWhy = new TextInputBuilder()
+          .setCustomId('moderator_why')
+          .setLabel('Why do you want to moderate?')
+          .setStyle(TextInputStyle.Paragraph)
+          .setPlaceholder('Motivation, availability, strengths')
+          .setRequired(true);
+
+        const modTimezone = new TextInputBuilder()
+          .setCustomId('moderator_timezone')
+          .setLabel('Timezone / Typical active hours')
+          .setStyle(TextInputStyle.Short)
+          .setPlaceholder('e.g., CET evenings, PST mornings')
+          .setRequired(false);
+
+        modal.addComponents(
+          new ActionRowBuilder().addComponents(modExperience),
+          new ActionRowBuilder().addComponents(modWhy),
+          new ActionRowBuilder().addComponents(modTimezone)
+        );
+
+        return interaction.showModal(modal);
+      }
+
+      // Accept application (no role checks as requested)
+      if (interaction.customId && interaction.customId.startsWith('accept_app:')) {
+        const applicantId = interaction.customId.split(':')[1];
+        const staff = interaction.user;
+
+        // Edit original application message: change color, update footer, disable buttons
+        try {
+          const origMsg = interaction.message;
+          const acceptedEmbed = EmbedBuilder.from(origMsg.embeds[0])
+            .setColor('#2ecc71')
+            .setFooter({ text: `Accepted by ${staff.tag} • Applicant ID: ${applicantId}` });
+
+          const disabledRow = new ActionRowBuilder().addComponents(
+            new ButtonBuilder().setCustomId('accepted_disabled').setLabel('Accepted').setStyle(ButtonStyle.Success).setDisabled(true),
+            new ButtonBuilder().setCustomId('deny_disabled').setLabel('Deny').setStyle(ButtonStyle.Secondary).setDisabled(true)
+          );
+
+          await origMsg.edit({ embeds: [acceptedEmbed], components: [disabledRow] });
+        } catch (err) {
+          console.error('Failed to update application message on accept:', err);
+        }
+
+        // DM applicant
+        try {
+          const user = await client.users.fetch(applicantId);
+          await user.send(`✅ Your application has been accepted by ${staff.tag}. A private ticket has been opened for you. Please check the server.`);
+        } catch (err) {
+          console.warn('Could not DM applicant on accept:', err);
+        }
+
+        // Create ticket channel in the guild where staff clicked
+        try {
+          const guild = interaction.guild;
+          const member = await guild.members.fetch(applicantId).catch(() => null);
+          const channelName = `app-${applicantId}`.slice(0, 100);
+
+          const permissionOverwrites = [
+            {
+              id: guild.roles.everyone,
+              deny: [PermissionsBitField.Flags.ViewChannel]
+            },
+            {
+              id: client.user.id,
+              allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages, PermissionsBitField.Flags.ManageChannels, PermissionsBitField.Flags.EmbedLinks]
+            }
+          ];
+
+          if (member) {
+            permissionOverwrites.push({
+              id: member.id,
+              allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages, PermissionsBitField.Flags.ReadMessageHistory]
+            });
+          }
+
+          const createOptions = {
+            name: channelName,
+            type: 0,
+            topic: `Application ticket for ${applicantId}`,
+            permissionOverwrites
+          };
+
+          if (TICKET_CATEGORY_ID) createOptions.parent = TICKET_CATEGORY_ID;
+
+          const ticketChannel = await guild.channels.create(createOptions);
+
+          const ticketEmbed = new EmbedBuilder()
+            .setColor('#2b2d31')
+            .setTitle('🎫 Application Accepted')
+            .setDescription(`This ticket was opened after your application was accepted by ${staff.tag}.`)
+            .addFields(
+              { name: 'Applicant', value: `<@${applicantId}>`, inline: true },
+              { name: 'Handled by', value: `${staff.tag}`, inline: true }
+            );
+
+          await ticketChannel.send({ content: `<@${applicantId}>`, embeds: [ticketEmbed] });
+        } catch (err) {
+          console.error('Failed to create ticket on accept:', err);
+        }
+
+        return interaction.reply({ content: 'Application accepted and ticket opened.', ephemeral: true });
+      }
+
+      // Deny application (no role checks)
+      if (interaction.customId && interaction.customId.startsWith('deny_app:')) {
+        const applicantId = interaction.customId.split(':')[1];
+        const staff = interaction.user;
+        const denialReason = 'Your application was not accepted at this time.'; // default; can be extended to prompt staff
+
+        // Update original application message to show denied and disable buttons
+        try {
+          const origMsg = interaction.message;
+          const deniedEmbed = EmbedBuilder.from(origMsg.embeds[0])
+            .setColor('#e74c3c')
+            .setFooter({ text: `Denied by ${staff.tag} • Applicant ID: ${applicantId}` });
+
+          const disabledRow = new ActionRowBuilder().addComponents(
+            new ButtonBuilder().setCustomId('accept_disabled').setLabel('Accept').setStyle(ButtonStyle.Secondary).setDisabled(true),
+            new ButtonBuilder().setCustomId('denied_disabled').setLabel('Denied').setStyle(ButtonStyle.Danger).setDisabled(true)
+          );
+
+          await origMsg.edit({ embeds: [deniedEmbed], components: [disabledRow] });
+        } catch (err) {
+          console.error('Failed to update application message on deny:', err);
+        }
+
+        // DM applicant
+        try {
+          const user = await client.users.fetch(applicantId);
+          await user.send(`❌ Your application has been denied by ${staff.tag}.\n\nReason: ${denialReason}`);
+        } catch (err) {
+          console.warn('Could not DM applicant on deny:', err);
+        }
+
+        return interaction.reply({ content: 'Application denied and applicant notified.', ephemeral: true });
+      }
+
+      // Close ticket button
+      if (interaction.customId === 'close_ticket') {
+        const channel = interaction.channel;
+        const isOwner = channel.name.includes(interaction.user.username) || interaction.member.permissions.has(PermissionsBitField.Flags.ManageGuild);
+        if (!isOwner) {
+          return interaction.reply({ content: 'Only the ticket owner or staff can close this.', ephemeral: true });
+        }
+        await interaction.reply({ content: 'Ticket closed. Deleting in 3 seconds...', ephemeral: true });
+        return setTimeout(() => channel.delete().catch(() => {}), 3000);
+      }
+    }
+
+    // MODAL SUBMISSIONS
+    if (interaction.isModalSubmit()) {
+      // Service submission
+      if (interaction.customId === 'service_modal') {
+        const title = interaction.fields.getTextInputValue('service_title');
+        const description = interaction.fields.getTextInputValue('service_description');
+        const experience = interaction.fields.getTextInputValue('service_experience') || 'None provided';
+        const applicant = interaction.user;
+
+        try {
+          const appsChannel = await client.channels.fetch(APPLICATIONS_CHANNEL_ID);
+          const appEmbed = new EmbedBuilder()
+            .setColor('#2b2d31')
+            .setTitle('📝 New Service Submission')
+            .addFields(
+              { name: 'User', value: `<@${applicant.id}>`, inline: true },
+              { name: 'Title', value: title, inline: true },
+              { name: 'Description', value: description, inline: false },
+              { name: 'Experience / Links', value: experience, inline: false }
+            )
+            .setFooter({ text: `Applicant ID: ${applicant.id}` });
+
+          const actionRow = new ActionRowBuilder().addComponents(
+            new ButtonBuilder().setCustomId(`accept_app:${applicant.id}`).setLabel('Accept').setStyle(ButtonStyle.Success),
+            new ButtonBuilder().setCustomId(`deny_app:${applicant.id}`).setLabel('Deny').setStyle(ButtonStyle.Danger)
+          );
+
+          await appsChannel.send({ embeds: [appEmbed], components: [actionRow] });
+        } catch (err) {
+          console.error('Failed to post service submission:', err);
+          return interaction.reply({ content: 'There was an error submitting your application. Try again later.', ephemeral: true });
+        }
+
+        return interaction.reply({ content: '✅ Service submission received. Staff will review it shortly.', ephemeral: true });
+      }
+
+      // Moderator submission
+      if (interaction.customId === 'moderator_modal') {
+        const experience = interaction.fields.getTextInputValue('moderator_experience');
+        const why = interaction.fields.getTextInputValue('moderator_why');
+        const timezone = interaction.fields.getTextInputValue('moderator_timezone') || 'Not provided';
+        const applicant = interaction.user;
+
+        try {
+          const appsChannel = await client.channels.fetch(APPLICATIONS_CHANNEL_ID);
+          const appEmbed = new EmbedBuilder()
+            .setColor('#2b2d31')
+            .setTitle('🛡️ New Moderator Application')
+            .addFields(
+              { name: 'User', value: `<@${applicant.id}>`, inline: true },
+              { name: 'Timezone / Hours', value: timezone, inline: true },
+              { name: 'Experience', value: experience, inline: false },
+              { name: 'Why', value: why, inline: false }
+            )
+            .setFooter({ text: `Applicant ID: ${applicant.id}` });
+
+          const actionRow = new ActionRowBuilder().addComponents(
+            new ButtonBuilder().setCustomId(`accept_app:${applicant.id}`).setLabel('Accept').setStyle(ButtonStyle.Success),
+            new ButtonBuilder().setCustomId(`deny_app:${applicant.id}`).setLabel('Deny').setStyle(ButtonStyle.Danger)
+          );
+
+          await appsChannel.send({ embeds: [appEmbed], components: [actionRow] });
+        } catch (err) {
+          console.error('Failed to post moderator application:', err);
+          return interaction.reply({ content: 'There was an error submitting your application. Try again later.', ephemeral: true });
+        }
+
+        return interaction.reply({ content: '✅ Moderator application received. Staff will review it shortly.', ephemeral: true });
+      }
     }
   } catch (err) {
     console.error('Interaction handler error:', err);
