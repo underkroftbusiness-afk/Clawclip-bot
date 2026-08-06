@@ -6,7 +6,10 @@ const {
   ButtonBuilder,
   ButtonStyle,
   EmbedBuilder,
-  PermissionsBitField
+  PermissionsBitField,
+  ModalBuilder,
+  TextInputBuilder,
+  TextInputStyle
 } = require('discord.js');
 
 const client = new Client({
@@ -26,7 +29,7 @@ const CAMPAIGN_INFO_CHANNEL_ID = "1515782662412046416";
 const CAMPAIGN_RULES_CHANNEL_ID = "1520485646311882945";
 const PARTNER_WITH_US_CHANNEL_ID = "1532762065758978190";
 const APPLICATIONS_CHANNEL_ID = "1534207951995408515";
-const TICKET_CATEGORY_ID = null; // optional: set a category ID for tickets or leave null
+const TICKET_CATEGORY_ID = null;
 // =======================
 
 client.once('ready', async () => {
@@ -66,11 +69,9 @@ client.once('ready', async () => {
   } catch (err) {
     console.error('Partner embed error:', err);
   }
-
-  // Optional: other ready-time embeds (support, rules, campaign) can be added here if needed
 });
-const { ModalBuilder, TextInputBuilder, TextInputStyle } = require('discord.js');
 
+// Welcome DM
 client.on('guildMemberAdd', async (member) => {
   try {
     await member.send("👋 Welcome to Underclips — The Clipping Server That Helps You!");
@@ -79,88 +80,109 @@ client.on('guildMemberAdd', async (member) => {
   }
 });
 
+// INTERACTIONS
 client.on('interactionCreate', async (interaction) => {
   try {
-    // BUTTONS: open modals or handle accept/deny/close
     if (interaction.isButton()) {
-      // Open Service Submission modal
+
+      // SERVICE SUBMISSION (UPDATED QUESTIONS)
       if (interaction.customId === 'apply_service') {
         const modal = new ModalBuilder()
           .setCustomId('service_modal')
           .setTitle('📝 Service Submission');
 
-        const serviceTitle = new TextInputBuilder()
-          .setCustomId('service_title')
-          .setLabel('Service Title')
+        const s1 = new TextInputBuilder()
+          .setCustomId('service_contact')
+          .setLabel('Contact (Telegram / Email / Discord)')
           .setStyle(TextInputStyle.Short)
-          .setPlaceholder('Short title for your service')
           .setRequired(true);
 
-        const serviceDescription = new TextInputBuilder()
-          .setCustomId('service_description')
-          .setLabel('Describe your service or project')
+        const s2 = new TextInputBuilder()
+          .setCustomId('service_offering')
+          .setLabel('What service are you offering?')
           .setStyle(TextInputStyle.Paragraph)
-          .setPlaceholder('Explain what you offer, pricing, examples, links...')
           .setRequired(true);
 
-        const serviceExperience = new TextInputBuilder()
-          .setCustomId('service_experience')
-          .setLabel('Relevant experience / portfolio links')
+        const s3 = new TextInputBuilder()
+          .setCustomId('service_pricing')
+          .setLabel('Pricing / Payment terms (Upfront or After)')
+          .setStyle(TextInputStyle.Short)
+          .setRequired(true);
+
+        const s4 = new TextInputBuilder()
+          .setCustomId('service_extra')
+          .setLabel('Anything we should know?')
           .setStyle(TextInputStyle.Paragraph)
-          .setPlaceholder('Years of experience, links to work, socials')
           .setRequired(false);
 
         modal.addComponents(
-          new ActionRowBuilder().addComponents(serviceTitle),
-          new ActionRowBuilder().addComponents(serviceDescription),
-          new ActionRowBuilder().addComponents(serviceExperience)
+          new ActionRowBuilder().addComponents(s1),
+          new ActionRowBuilder().addComponents(s2),
+          new ActionRowBuilder().addComponents(s3),
+          new ActionRowBuilder().addComponents(s4)
         );
 
         return interaction.showModal(modal);
       }
 
-      // Open Moderator Application modal
+      // MODERATOR APPLICATION (UPDATED QUESTIONS)
       if (interaction.customId === 'apply_moderator') {
         const modal = new ModalBuilder()
           .setCustomId('moderator_modal')
-          .setTitle('Do you have any questions for us?');
+          .setTitle('🛡️ Moderator Application'); // TITLE STAYS SAME
 
-        const modExperience = new TextInputBuilder()
-          .setCustomId('moderator_experience')
-          .setLabel('Moderation experience')
-          .setStyle(TextInputStyle.Paragraph)
-          .setPlaceholder('Describe previous mod experience, tools used, hours available')
-          .setRequired(true);
-
-        const modWhy = new TextInputBuilder()
-          .setCustomId('moderator_why')
-          .setLabel('Why do you want to moderate?')
-          .setStyle(TextInputStyle.Paragraph)
-          .setPlaceholder('Motivation, availability, strengths')
-          .setRequired(true);
-
-        const modTimezone = new TextInputBuilder()
-          .setCustomId('moderator_timezone')
-          .setLabel('Timezone / Typical active hours')
+        const q1 = new TextInputBuilder()
+          .setCustomId('mod_discord_age')
+          .setLabel('Discord @ + Age')
           .setStyle(TextInputStyle.Short)
-          .setPlaceholder('e.g., CET evenings, PST mornings')
+          .setRequired(true);
+
+        const q2 = new TextInputBuilder()
+          .setCustomId('mod_timezone')
+          .setLabel('Timezone')
+          .setStyle(TextInputStyle.Short)
+          .setRequired(true);
+
+        const q3 = new TextInputBuilder()
+          .setCustomId('mod_activity')
+          .setLabel('Activity (Weekly + Daily hours)')
+          .setStyle(TextInputStyle.Paragraph)
+          .setRequired(true);
+
+        const q4 = new TextInputBuilder()
+          .setCustomId('mod_why')
+          .setLabel('Why do you want to be moderator here?')
+          .setStyle(TextInputStyle.Paragraph)
+          .setRequired(true);
+
+        const q5 = new TextInputBuilder()
+          .setCustomId('mod_experience')
+          .setLabel('Experience')
+          .setStyle(TextInputStyle.Paragraph)
+          .setRequired(true);
+
+        const q6 = new TextInputBuilder()
+          .setCustomId('mod_questions')
+          .setLabel('Do you have any questions for us?')
+          .setStyle(TextInputStyle.Paragraph)
           .setRequired(false);
 
         modal.addComponents(
-          new ActionRowBuilder().addComponents(modExperience),
-          new ActionRowBuilder().addComponents(modWhy),
-          new ActionRowBuilder().addComponents(modTimezone)
+          new ActionRowBuilder().addComponents(q1),
+          new ActionRowBuilder().addComponents(q2),
+          new ActionRowBuilder().addComponents(q3),
+          new ActionRowBuilder().addComponents(q4),
+          new ActionRowBuilder().addComponents(q5),
+          new ActionRowBuilder().addComponents(q6)
         );
 
         return interaction.showModal(modal);
       }
-
-      // Accept application (no role checks as requested)
+      // Accept application (no role checks)
       if (interaction.customId && interaction.customId.startsWith('accept_app:')) {
         const applicantId = interaction.customId.split(':')[1];
         const staff = interaction.user;
 
-        // Edit original application message: change color, update footer, disable buttons
         try {
           const origMsg = interaction.message;
           const acceptedEmbed = EmbedBuilder.from(origMsg.embeds[0])
@@ -177,29 +199,21 @@ client.on('interactionCreate', async (interaction) => {
           console.error('Failed to update application message on accept:', err);
         }
 
-        // DM applicant
         try {
           const user = await client.users.fetch(applicantId);
-          await user.send(`✅ Your application has been accepted by ${staff.tag}. A private ticket has been opened for you. Please check the server.`);
+          await user.send(`✅ Your application has been accepted by ${staff.tag}. A private ticket has been opened for you.`);
         } catch (err) {
           console.warn('Could not DM applicant on accept:', err);
         }
 
-        // Create ticket channel in the guild where staff clicked
         try {
           const guild = interaction.guild;
           const member = await guild.members.fetch(applicantId).catch(() => null);
           const channelName = `app-${applicantId}`.slice(0, 100);
 
           const permissionOverwrites = [
-            {
-              id: guild.roles.everyone,
-              deny: [PermissionsBitField.Flags.ViewChannel]
-            },
-            {
-              id: client.user.id,
-              allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages, PermissionsBitField.Flags.ManageChannels, PermissionsBitField.Flags.EmbedLinks]
-            }
+            { id: guild.roles.everyone, deny: [PermissionsBitField.Flags.ViewChannel] },
+            { id: client.user.id, allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages, PermissionsBitField.Flags.ManageChannels] }
           ];
 
           if (member) {
@@ -237,13 +251,11 @@ client.on('interactionCreate', async (interaction) => {
         return interaction.reply({ content: 'Application accepted and ticket opened.', ephemeral: true });
       }
 
-      // Deny application (no role checks)
+      // Deny application
       if (interaction.customId && interaction.customId.startsWith('deny_app:')) {
         const applicantId = interaction.customId.split(':')[1];
         const staff = interaction.user;
-        const denialReason = 'Your application was not accepted at this time.'; // default; can be extended to prompt staff
 
-        // Update original application message to show denied and disable buttons
         try {
           const origMsg = interaction.message;
           const deniedEmbed = EmbedBuilder.from(origMsg.embeds[0])
@@ -260,10 +272,9 @@ client.on('interactionCreate', async (interaction) => {
           console.error('Failed to update application message on deny:', err);
         }
 
-        // DM applicant
         try {
           const user = await client.users.fetch(applicantId);
-          await user.send(`❌ Your application has been denied by ${staff.tag}.\n\nReason: ${denialReason}`);
+          await user.send(`❌ Your application has been denied by ${staff.tag}.`);
         } catch (err) {
           console.warn('Could not DM applicant on deny:', err);
         }
@@ -271,13 +282,15 @@ client.on('interactionCreate', async (interaction) => {
         return interaction.reply({ content: 'Application denied and applicant notified.', ephemeral: true });
       }
 
-      // Close ticket button
+      // Close ticket
       if (interaction.customId === 'close_ticket') {
         const channel = interaction.channel;
         const isOwner = channel.name.includes(interaction.user.username) || interaction.member.permissions.has(PermissionsBitField.Flags.ManageGuild);
+
         if (!isOwner) {
           return interaction.reply({ content: 'Only the ticket owner or staff can close this.', ephemeral: true });
         }
+
         await interaction.reply({ content: 'Ticket closed. Deleting in 3 seconds...', ephemeral: true });
         return setTimeout(() => channel.delete().catch(() => {}), 3000);
       }
@@ -285,23 +298,27 @@ client.on('interactionCreate', async (interaction) => {
 
     // MODAL SUBMISSIONS
     if (interaction.isModalSubmit()) {
-      // Service submission
+
+      // SERVICE SUBMISSION (UPDATED)
       if (interaction.customId === 'service_modal') {
-        const title = interaction.fields.getTextInputValue('service_title');
-        const description = interaction.fields.getTextInputValue('service_description');
-        const experience = interaction.fields.getTextInputValue('service_experience') || 'None provided';
+        const contact = interaction.fields.getTextInputValue('service_contact');
+        const offering = interaction.fields.getTextInputValue('service_offering');
+        const pricing = interaction.fields.getTextInputValue('service_pricing');
+        const extra = interaction.fields.getTextInputValue('service_extra') || 'None';
         const applicant = interaction.user;
 
         try {
           const appsChannel = await client.channels.fetch(APPLICATIONS_CHANNEL_ID);
+
           const appEmbed = new EmbedBuilder()
             .setColor('#2b2d31')
             .setTitle('📝 New Service Submission')
             .addFields(
               { name: 'User', value: `<@${applicant.id}>`, inline: true },
-              { name: 'Title', value: title, inline: true },
-              { name: 'Description', value: description, inline: false },
-              { name: 'Experience / Links', value: experience, inline: false }
+              { name: 'Contact', value: contact, inline: true },
+              { name: 'Service', value: offering, inline: false },
+              { name: 'Pricing', value: pricing, inline: false },
+              { name: 'Extra Info', value: extra, inline: false }
             )
             .setFooter({ text: `Applicant ID: ${applicant.id}` });
 
@@ -313,29 +330,36 @@ client.on('interactionCreate', async (interaction) => {
           await appsChannel.send({ embeds: [appEmbed], components: [actionRow] });
         } catch (err) {
           console.error('Failed to post service submission:', err);
-          return interaction.reply({ content: 'There was an error submitting your application. Try again later.', ephemeral: true });
+          return interaction.reply({ content: 'Error submitting your service.', ephemeral: true });
         }
 
-        return interaction.reply({ content: '✅ Service submission received. Staff will review it shortly.', ephemeral: true });
+        return interaction.reply({ content: '✅ Service submission received.', ephemeral: true });
       }
 
-      // Moderator submission
+      // MODERATOR SUBMISSION (UPDATED)
       if (interaction.customId === 'moderator_modal') {
-        const experience = interaction.fields.getTextInputValue('moderator_experience');
-        const why = interaction.fields.getTextInputValue('moderator_why');
-        const timezone = interaction.fields.getTextInputValue('moderator_timezone') || 'Not provided';
+        const discordAge = interaction.fields.getTextInputValue('mod_discord_age');
+        const timezone = interaction.fields.getTextInputValue('mod_timezone');
+        const activity = interaction.fields.getTextInputValue('mod_activity');
+        const why = interaction.fields.getTextInputValue('mod_why');
+        const experience = interaction.fields.getTextInputValue('mod_experience');
+        const questions = interaction.fields.getTextInputValue('mod_questions') || 'None';
         const applicant = interaction.user;
 
         try {
           const appsChannel = await client.channels.fetch(APPLICATIONS_CHANNEL_ID);
+
           const appEmbed = new EmbedBuilder()
             .setColor('#2b2d31')
             .setTitle('🛡️ New Moderator Application')
             .addFields(
               { name: 'User', value: `<@${applicant.id}>`, inline: true },
-              { name: 'Timezone / Hours', value: timezone, inline: true },
+              { name: 'Discord @ + Age', value: discordAge, inline: true },
+              { name: 'Timezone', value: timezone, inline: true },
+              { name: 'Activity', value: activity, inline: false },
+              { name: 'Why', value: why, inline: false },
               { name: 'Experience', value: experience, inline: false },
-              { name: 'Why', value: why, inline: false }
+              { name: 'Questions', value: questions, inline: false }
             )
             .setFooter({ text: `Applicant ID: ${applicant.id}` });
 
@@ -347,20 +371,21 @@ client.on('interactionCreate', async (interaction) => {
           await appsChannel.send({ embeds: [appEmbed], components: [actionRow] });
         } catch (err) {
           console.error('Failed to post moderator application:', err);
-          return interaction.reply({ content: 'There was an error submitting your application. Try again later.', ephemeral: true });
+          return interaction.reply({ content: 'Error submitting your application.', ephemeral: true });
         }
 
-        return interaction.reply({ content: '✅ Moderator application received. Staff will review it shortly.', ephemeral: true });
+        return interaction.reply({ content: '✅ Moderator application received.', ephemeral: true });
       }
     }
   } catch (err) {
     console.error('Interaction handler error:', err);
-    if (interaction && !interaction.replied && !interaction.deferred) {
-      try { await interaction.reply({ content: 'An error occurred while processing your interaction.', ephemeral: true }); } catch {}
+    if (!interaction.replied && !interaction.deferred) {
+      try { await interaction.reply({ content: 'An error occurred.', ephemeral: true }); } catch {}
     }
   }
 });
 
+// Ping command
 client.on('messageCreate', (message) => {
   if (message.author.bot) return;
   if (message.content === '!ping') {
@@ -369,8 +394,6 @@ client.on('messageCreate', (message) => {
 });
 
 client.login(process.env.DISCORD_TOKEN);
-
-
 
 
 
